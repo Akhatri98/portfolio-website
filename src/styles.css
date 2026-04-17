@@ -1,0 +1,261 @@
+:root {
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  color: #f5f0e8;
+  background:
+    radial-gradient(circle at top left, rgba(255, 125, 90, 0.22), transparent 28%),
+    radial-gradient(circle at top right, rgba(101, 211, 255, 0.2), transparent 24%),
+    linear-gradient(180deg, #151311 0%, #0c0b0a 100%);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+code {
+  font-family: "IBM Plex Mono", "Cascadia Code", monospace;
+}
+
+.shell {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  padding: 32px;
+}
+
+.aurora {
+  position: absolute;
+  width: 32rem;
+  height: 32rem;
+  border-radius: 999px;
+  filter: blur(100px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.aurora-left {
+  top: -10rem;
+  left: -8rem;
+  background: rgba(255, 110, 64, 0.4);
+}
+
+.aurora-right {
+  top: 10rem;
+  right: -10rem;
+  background: rgba(54, 162, 235, 0.32);
+}
+
+.topbar,
+.grid {
+  position: relative;
+  z-index: 1;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.topbar h1 {
+  margin: 0.25rem 0 0;
+  max-width: 11ch;
+  font-size: clamp(3rem, 9vw, 6.2rem);
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+}
+
+.eyebrow,
+.kicker,
+.section-label {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.76rem;
+  color: #f7b17a;
+}
+
+.ghost-link {
+  padding: 0.9rem 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1.4fr 0.9fr;
+  gap: 1rem;
+}
+
+.panel {
+  padding: 1.5rem;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(22, 20, 18, 0.7);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
+}
+
+.hero {
+  min-height: 20rem;
+}
+
+.lede {
+  max-width: 42rem;
+  margin: 1rem 0 2rem;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: rgba(245, 240, 232, 0.76);
+}
+
+.code-card,
+.data-card,
+.command-stack code,
+.status-pill {
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.code-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.95rem 1.1rem;
+  border-radius: 18px;
+}
+
+.dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff8a5b, #ffd25e);
+  box-shadow: 0 0 20px rgba(255, 138, 91, 0.5);
+}
+
+.status-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: fit-content;
+  padding: 0.8rem 1rem;
+  border-radius: 999px;
+}
+
+.status-pill span {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.status-loading {
+  color: #ffd25e;
+}
+
+.status-ready {
+  color: #7ef0b4;
+}
+
+.status-error {
+  color: #ff8d8d;
+}
+
+.muted {
+  margin: 0;
+  color: rgba(245, 240, 232, 0.63);
+  line-height: 1.6;
+}
+
+.card-list {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.data-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 18px;
+}
+
+.placeholder {
+  justify-content: flex-start;
+}
+
+.card-title {
+  margin: 0 0 0.2rem;
+  font-size: 1rem;
+}
+
+.command-stack {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.command-stack code {
+  display: block;
+  padding: 0.95rem 1rem;
+  border-radius: 16px;
+  color: #f9d6b8;
+}
+
+@media (max-width: 900px) {
+  .shell {
+    padding: 20px;
+  }
+
+  .topbar,
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    align-items: stretch;
+  }
+
+  .ghost-link {
+    width: fit-content;
+  }
+}
