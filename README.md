@@ -1,11 +1,17 @@
-.venv/Scripts/flask.exe --app main run
+# Portfolio Website
 
-Frontend development:
+A personal portfolio site built with React, TypeScript, and Vite.
 
+## Development
+
+```bash
 npm install
 npm run dev
+```
 
-Production-style local build served by Flask:
+## Build
 
+```bash
 npm run build
-flask --app main run.venv/Scripts/flask.exe --app main run
+npm run preview
+```
