@@ -261,7 +261,6 @@ const ACTIVITY = [
 
 const CONTACT = [
   { lbl: 'EMAIL', val: 'adeelkhatri98@gmail.com', href: 'mailto:adeelkhatri98@gmail.com' },
-  { lbl: 'PHONE', val: '+1 (419) 819-1781', href: 'tel:+14198191781' },
   { lbl: 'GITHUB', val: 'github.com/Akhatri98', href: 'https://github.com/Akhatri98' },
   { lbl: 'LINKEDIN', val: 'linkedin.com/in/adeelk98', href: 'https://linkedin.com/in/adeelk98' },
   { lbl: 'LOCATION', val: 'New York, NY', href: '' },
@@ -314,7 +313,6 @@ const LINKS: Record<string, string> = {
   GITHUB: 'https://github.com/Akhatri98',
   LI: 'https://linkedin.com/in/adeelk98',
   LINKEDIN: 'https://linkedin.com/in/adeelk98',
-  RESUME: '/resume.pdf',
 };
 
 const GO_CONTACT: Record<string, { val: string; href: string }> = {};
@@ -322,9 +320,6 @@ CONTACT.forEach((c) => { GO_CONTACT[c.lbl] = { val: c.val, href: c.href }; });
 GO_CONTACT.GH = GO_CONTACT.GITHUB;
 GO_CONTACT.LI = GO_CONTACT.LINKEDIN;
 GO_CONTACT.MAIL = GO_CONTACT.EMAIL;
-GO_CONTACT.CALL = GO_CONTACT.PHONE;
-GO_CONTACT.RESUME = { val: 'resume.pdf', href: '/resume.pdf' };
-GO_CONTACT.CV = GO_CONTACT.RESUME;
 const GO_CONTACT_LIST = ['', 'CONTACT', 'CT', 'REACH', 'HIRE', 'SOCIAL', 'LINKS'];
 
 const HELP_ROWS = [
@@ -660,10 +655,213 @@ function ScreenHelp() {
   );
 }
 
+/* ───────────────────────── mobile (touch) ─────────────────────────
+   On touch devices the keyboard-driven terminal (command input + log feed)
+   is hidden entirely. Navigation and links become tappable instead. */
+
+const MOBILE_NAV = NAV.filter((n) => n.view !== 'HELP');
+
+function MobileProjects() {
+  const [open, setOpen] = useState<string | null>(null);
+  return (
+    <div className="screen">
+      <Panel title="PROJECT PORTFOLIO" right={`${PROJECTS.length} POSITIONS`}>
+        <div className="m-list">
+          {PROJECTS.map((p) => {
+            const body = (
+              <>
+                <div className="m-card-top">
+                  <span className="sym">{p.sym}</span>
+                  <span className={`tag ${p.status}`}>{p.status.toUpperCase()}</span>
+                </div>
+                <div className="m-card-name">{p.name}</div>
+                <div className="m-card-stack">{p.stack} · {p.yr}</div>
+                {p.repo && <div className="m-card-go">OPEN REPO ▸</div>}
+                {!p.repo && p.note && (
+                  <div className="m-card-go">{open === p.sym ? p.note : 'WHY PRIVATE? ▸'}</div>
+                )}
+              </>
+            );
+            if (p.repo) {
+              return (
+                <a className="m-card" key={p.sym} href={p.repo} target="_blank" rel="noreferrer">
+                  {body}
+                </a>
+              );
+            }
+            return (
+              <button
+                className="m-card"
+                key={p.sym}
+                onClick={() => setOpen((cur) => (cur === p.sym ? null : p.sym))}
+              >
+                {body}
+              </button>
+            );
+          })}
+        </div>
+        <p className="hint">▸ Tap a project to open its repo — or see why it's private.</p>
+      </Panel>
+    </div>
+  );
+}
+
+function MobileContact() {
+  return (
+    <div className="screen">
+      <Panel title="CONTACT — DIRECT LINES" right="TAP TO OPEN">
+        <div className="m-list">
+          {CONTACT.map((c) => {
+            const inner = (
+              <>
+                <span className="lk-lbl">{c.lbl}</span>
+                <span className="m-contact-val">{c.val}</span>
+                {c.href && <span className="lk-go">OPEN ▸</span>}
+              </>
+            );
+            return c.href ? (
+              <a
+                className="m-contact"
+                key={c.lbl}
+                href={c.href}
+                target={c.href.startsWith('http') ? '_blank' : undefined}
+                rel="noreferrer"
+              >
+                {inner}
+              </a>
+            ) : (
+              <div className="m-contact" key={c.lbl}>{inner}</div>
+            );
+          })}
+        </div>
+      </Panel>
+    </div>
+  );
+}
+
+function MobileApp() {
+  const [view, setView] = useState<View>('DASH');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [now, setNow] = useState(new Date());
+  const { quotes, live } = useQuotes();
+  const mainRef = useRef<HTMLDivElement>(null);
+
+  const curLabel = NAV.find((n) => n.view === view)?.label ?? String(view);
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const clock = useMemo(() => now.toLocaleTimeString('en-GB', { hour12: false }), [now]);
+
+  useEffect(() => { mainRef.current?.scrollTo(0, 0); }, [view]);
+
+  const screen = {
+    DASH: <ScreenDash clock={clock} />,
+    ABOUT: <ScreenAbout />,
+    SKILLS: <ScreenSkills clock={clock} />,
+    PROJECTS: <MobileProjects />,
+    EXP: <ScreenExp />,
+    EDU: <ScreenEdu />,
+    COURSES: <ScreenCourses />,
+    READING: <ScreenReading />,
+    CONTACT: <MobileContact />,
+    HELP: <ScreenHelp />,
+  }[view];
+
+  return (
+    <div className="m-app">
+      <header className="m-hdr">
+        <div className="m-hdr-row">
+          <span className="m-name">{PROFILE.name}</span>
+          <span className="m-tick">{PROFILE.ticker}</span>
+        </div>
+        <div className="m-role">{PROFILE.role}</div>
+      </header>
+
+      <div className="m-navbar">
+        <button
+          className={`m-menu-btn ${menuOpen ? 'open' : ''}`}
+          onClick={() => setMenuOpen((o) => !o)}
+          aria-haspopup="menu"
+          aria-expanded={menuOpen}
+        >
+          <span className="m-menu-cur">{curLabel}</span>
+          <span className="m-menu-caret">{menuOpen ? '▲' : '▼'}</span>
+        </button>
+
+        {menuOpen && (
+          <ul className="m-menu" role="menu">
+            {MOBILE_NAV.map((n) => (
+              <li key={n.view} role="none">
+                <button
+                  role="menuitem"
+                  className={`m-menu-item ${view === n.view ? 'active' : ''}`}
+                  onClick={() => { setView(n.view); setMenuOpen(false); }}
+                >
+                  <span className="m-menu-key">{n.key}</span>
+                  <span>{n.label}</span>
+                  {view === n.view && <span className="m-menu-tick">◂</span>}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {menuOpen && <div className="m-menu-backdrop" onClick={() => setMenuOpen(false)} />}
+
+      <main className="m-main" ref={mainRef}>{screen}</main>
+
+      <div className="tape">
+        <div className="tape-track">
+          {[...quotes, ...quotes].map((t, i) => (
+            <span className="tape-item" key={i} title={t.name}>
+              <span className="tape-sym">{t.sym}</span>
+              <span className="tape-val">{t.price.toFixed(2)}</span>
+              <span className={t.pct >= 0 ? 'up' : 'down'}>
+                {t.pct >= 0 ? '▲' : '▼'}{Math.abs(t.pct).toFixed(2)}%
+              </span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="status m-status">
+        <span><span className="blink">●</span> LIVE</span>
+        <span>QUOTES: {live ? 'LIVE' : 'DELAYED'}</span>
+        <span className="sp">{clock}</span>
+      </div>
+    </div>
+  );
+}
+
+/* True for primarily-touch devices and very narrow viewports — where the
+   fixed-scale keyboard terminal would be unusable. */
+function useIsMobile() {
+  const query = '(max-width: 768px), (pointer: coarse) and (hover: none)';
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia(query).matches
+  );
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const onChange = () => setIsMobile(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  return isMobile;
+}
+
 type LogEntry = { id: number; time: string; cmd: string; msg: string; ok: boolean };
 const nowStr = () => new Date().toLocaleTimeString('en-GB', { hour12: false });
 
 export default function App() {
+  const isMobile = useIsMobile();
+  return isMobile ? <MobileApp /> : <DesktopApp />;
+}
+
+function DesktopApp() {
   const [view, setView] = useState<View>('DASH');
   const [input, setInput] = useState('');
   const [history, setHistory] = useState<string[]>([]);

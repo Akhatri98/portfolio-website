@@ -395,5 +395,182 @@ body {
 @keyframes blink { 50% { opacity: 0; } }
 .status .sp { margin-left: auto; }
 
-/* No responsive breakpoints: the 1920×1080 canvas scales as one unit, so the
-   layout never reflows — it just zooms to fit (with black trim around it). */
+/* The desktop 1920×1080 canvas scales as one unit and never reflows — it just
+   zooms to fit. On touch devices we swap to the fluid layout below instead. */
+
+/* ───────────────────────── mobile (touch) ───────────────────────── */
+/* Rendered in place of .frame/.terminal on touch devices. The keyboard-driven
+   command bar + log feed are gone; everything is navigated by tapping. */
+.m-app {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(ellipse at center, rgba(255, 158, 27, 0.03) 0%, transparent 70%),
+    var(--bg);
+  overflow: hidden;
+}
+/* CRT scanline overlay — parity with the desktop terminal */
+.m-app::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.16) 3px
+  );
+}
+
+.m-hdr {
+  flex: none;
+  background: var(--amber);
+  color: #000;
+  text-shadow: none;
+  padding: 9px 14px;
+}
+.m-hdr-row { display: flex; align-items: center; gap: 10px; }
+.m-name { font-size: 16px; font-weight: 700; letter-spacing: 0.04em; }
+.m-tick {
+  background: #000;
+  color: var(--amber);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+}
+.m-role { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+
+/* section picker — a dropdown button below the header */
+.m-navbar {
+  flex: none;
+  position: relative;
+  z-index: 61;
+  padding: 8px 10px;
+  background: var(--bg-panel-2);
+  border-bottom: 1px solid var(--border-amber);
+}
+.m-menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-amber);
+  color: var(--amber-bright);
+  font: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  padding: 9px 13px;
+  cursor: pointer;
+  text-shadow: inherit;
+}
+.m-menu-btn.open { background: var(--bg-hover); border-color: var(--amber); }
+.m-menu-caret { color: var(--amber-dim); font-size: 11px; }
+
+.m-menu {
+  position: absolute;
+  top: 100%;
+  left: 10px;
+  right: 10px;
+  margin-top: -1px;
+  list-style: none;
+  background: var(--bg-panel);
+  border: 1px solid var(--amber);
+  max-height: 70vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+.m-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--amber-dim);
+  font: inherit;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  padding: 11px 13px;
+  text-align: left;
+  cursor: pointer;
+  text-shadow: inherit;
+}
+.m-menu li:last-child .m-menu-item { border-bottom: none; }
+.m-menu-item:active { background: var(--bg-hover); }
+.m-menu-item.active { background: var(--bg-hover); color: var(--amber-bright); font-weight: 700; }
+.m-menu-key { color: var(--cyan); font-size: 11px; width: 16px; flex: none; }
+.m-menu-tick { margin-left: auto; color: var(--amber); }
+
+/* tap-anywhere-to-close layer beneath the open menu */
+.m-menu-backdrop { position: absolute; inset: 0; z-index: 60; }
+
+.m-main {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px;
+}
+
+/* reflow reused desktop screens into one column.
+   minmax(0, 1fr) lets tracks shrink below their nowrap min-content so long
+   timestamps / labels overflow *within* a panel instead of widening the page. */
+.m-main .screen,
+.m-main .screen.cols-2 { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.m-main .quotes { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.m-main .kv { grid-template-columns: 110px minmax(0, 1fr); }
+.m-main .help-grid { grid-template-columns: 80px 1fr; }
+/* tables shrink to fit; if still too wide they scroll inside their panel */
+.m-main .panel-body { overflow-x: auto; }
+.m-main .tbl { font-size: 11px; }
+.m-main .tbl th, .m-main .tbl td { padding: 4px 6px; }
+
+/* project cards */
+.m-list { display: grid; gap: 8px; }
+.m-card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  text-shadow: inherit;
+  text-decoration: none;
+  background: var(--bg-panel-2);
+  border: 1px solid var(--border-amber);
+  color: var(--white);
+  padding: 11px 12px;
+  cursor: pointer;
+}
+.m-card:active { background: var(--bg-hover); }
+.m-card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.m-card-top .sym { color: var(--amber-bright); font-weight: 700; font-size: 14px; }
+.m-card-name { color: var(--white); margin-top: 4px; }
+.m-card-stack { color: var(--gray); font-size: 11px; margin-top: 2px; }
+.m-card-go { color: var(--amber-dim); font-size: 11px; margin-top: 7px; }
+
+/* contact rows */
+.m-contact {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg-panel-2);
+  border: 1px solid var(--border-amber);
+  color: var(--white);
+  text-decoration: none;
+  text-shadow: inherit;
+}
+.m-contact:active { background: var(--bg-hover); }
+.m-contact .lk-lbl { color: var(--cyan); font-size: 10px; letter-spacing: 0.06em; width: 64px; flex: none; }
+.m-contact-val { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.m-contact .lk-go { color: var(--amber-dim); font-size: 11px; flex: none; }
+
+.m-status { flex: none; gap: 12px; }
