@@ -2,3 +2,8 @@
 *.log
 node_modules/
 dist/
+
+# local env files (keep the Finnhub token out of git)
+.env
+.env.*
+!.env.example
