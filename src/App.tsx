@@ -3,17 +3,19 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 const PROFILE = {
   name: 'ADEEL KHATRI',
   ticker: 'AK',
-  role: 'Math + CS @ NYU Courant',
+  role: 'Student @ Courant',
   location: 'NEW YORK, NY',
   status: 'ONLINE',
   blurb: [
-    'yo.'
+    'Yo ✌️. I\'m Adeel, a student at NYU Courant interested in tech, data, and where the future is headed with AI.',
+    'I think I\'m somewhat creative, I definitly try to be, and I bring that to the work I do in tech. But being analytical and data oriented is like a biological imperative for me. Maybe that\'s why I like math. Who knows. I\'ve been sorounded by tech for a few years now, like I remeber early in high school I chrooted a middle school chromebook to play minecraft. I haven\'t stopped since though, but I am a lot more software oriented now.',
+    'Honestly, I don\'t really know what I\'m doing, or what direction I want to go in, so I\'m iffy on making any claims like that. I\'m not sure what else to put here but feel free to contact me for any questions.',
   ],
 };
 
 const METRICS: { lbl: string; val: string; chg: string; dir: 'up' | 'down' | 'flat' }[] = [
   { lbl: 'CAFFEINE INTAKE', val: '740MG', chg: '+5.4σ', dir: 'up' },
-  { lbl: 'TOTAL GIT COMMITS', val: '230', chg: '+135 YoY', dir: 'up' },
+  { lbl: 'TOTAL GIT COMMITS', val: '236', chg: '+141 YoY', dir: 'up' },
   { lbl: 'LOC', val: '33.4K', chg: '+24% MoM', dir: 'up' },
   { lbl: 'LATEX COMPILE ERRORS', val: '37', chg: '+5 MoM', dir: 'up' },
   { lbl: 'MINECRAFT', val: '982H', chg: '0% this week', dir: 'flat' },
@@ -78,7 +80,7 @@ const PROJECTS = [
     repo: 'https://github.com/Akhatri98/TF-IDF-news-model', note: '',
   },
   {
-    sym: 'MOMNTM', name: 'Cross-Asset Momentum Allocator', stack: 'Python · pandas · streamlit', status: 'live', yr: 2025,
+    sym: 'MOMNTM', name: 'Cross-Asset Momentum Allocator', stack: 'Python · pandas · streamlit', status: 'arch', yr: 2025,
     repo: '', note: 'PRIVATE - I use this to actually trade, so I\'m not comfortable sharing the code publicly.',
   },
   {
@@ -90,8 +92,8 @@ const PROJECTS = [
     repo: 'https://github.com/Akhatri98/NHANES-model', note: '',
   },
   {
-    sym: 'JBOT', name: 'Job Aggregator Bot', stack: 'Python · Open Crawl · Supabase', status: 'wip', yr: 2026,
-    repo: 'https://github.com/Akhatri98/Job-Bot', note: '',
+    sym: 'JBOT', name: 'Job Aggregator', stack: 'Python · Open Crawl · Supabase', status: 'live', yr: 2026,
+    repo: 'https://internships.akhatri.dev/', note: '',
   },
   {
     sym: 'DSCAGENT', name: 'LangChain Discord Agent', stack: 'Python · LangChain · APIs', status: 'arch', yr: 2025,
@@ -105,11 +107,11 @@ const PROJECTS = [
 
 const EXPERIENCE = [
   {
-    role: 'Member of Technical Staff',
-    co: 'Stealth',
+    role: 'Someone',
+    co: 'Somewhere',
     when: 'MAY 2026 — PRESENT',
     bullets: [
-      'Modernizing regtech.',
+      'I\'m not telling.',
     ],
   },
   {
@@ -246,7 +248,7 @@ const READING = [
 
   { title: 'A Concise Course in Algebraic Topology', author: 'J.P. May', tag: 'MATH', status: 'queued', rating: 0 },
   { title: 'Proofs from THE BOOK', author: 'M. Aigner & G.M. Ziegler', tag: 'MATH', status: 'queued', rating: 0 },
-  { title: 'The Anduril Thesis', author: 'Anduril', tag: 'SYSTEMS', status: 'queued', rating: 0 },
+  { title: 'The Anduril Thesis', author: 'K. Harrison & S. Maini', tag: 'SYSTEMS', status: 'queued', rating: 0 },
   { title: 'The Beginning of Guidance', author: 'Al-Ghazali', tag: 'PHILOSOPHY', status: 'queued', rating: 0 },
 ];
 
@@ -263,7 +265,7 @@ const CONTACT = [
   { lbl: 'EMAIL', val: 'adeelkhatri98@gmail.com', href: 'mailto:adeelkhatri98@gmail.com' },
   { lbl: 'GITHUB', val: 'github.com/Akhatri98', href: 'https://github.com/Akhatri98' },
   { lbl: 'LINKEDIN', val: 'linkedin.com/in/adeelk98', href: 'https://linkedin.com/in/adeelk98' },
-  { lbl: 'LOCATION', val: 'New York, NY', href: '' },
+  { lbl: 'LOCATION', val: 'Toledo, OH', href: '' },
 ];
 
 const TAPE_SYMBOLS = [
