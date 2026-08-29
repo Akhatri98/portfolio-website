@@ -136,14 +136,22 @@ h1 {
   color: var(--rule-2);
 }
 
+/* A wrapping flex row, not an inline run. The links are rendered from an
+   array with no whitespace between them, so inline layout gives the line no
+   break opportunity at all and it overflows any narrow screen however many
+   links there are. The gap both spaces them and lets them wrap. */
 .contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
   margin-top: 1rem;
   margin-bottom: 0;
   font-size: 0.95rem;
 }
 
-.contact a + a {
-  margin-left: 1.1rem;
+/* an address longer than the line breaks rather than pokes out of it */
+.contact a {
+  overflow-wrap: break-word;
 }
 
 /* ----------------------------- contents -----------------------------
@@ -441,8 +449,8 @@ h3 {
     gap: 0.6rem;
   }
 
-  .contact a + a {
-    margin-left: 0.9rem;
+  .contact {
+    gap: 0.35rem 0.9rem;
   }
 
   .entry-head {
