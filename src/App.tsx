@@ -8,7 +8,9 @@ const PROFILE = {
   role: 'Mathematics & Computer Science, NYU Courant',
   location: 'New York, NY',
   blurb: [
-    'I\'m still thinking about what to put here. Stay tuned.',
+    'I\'ve always been fascinated by how things work under the hood. As a math/CS student, my core drive is optimization. Taking outdated/nonoptimal systems, removing friction, and engineering efficient architectures.',
+    'On the flip side, I\'m a builder at heart. I love rapid prototyping, spinning up a scrappy version of an idea just to get it out of my head and into the world. Once it\'s alive, that\'s when I start spending the next stretch of time refining, optimizing, and scaling it into something robust. Whether I\'m deep in a theoretical problem or writing code to fix a bottleneck, I just love making things work better.',
+    'Below is some of the work I\'ve done and continue to pour my time and effort into. Please reach out if you have any questions.'
   ],
 };
 
@@ -80,13 +82,13 @@ const EXPERIENCE = [
   },
   {
     role: 'Undergraduate research assistant',
-    co: 'Ohio State University, College of Veterinary Medicine',
+    co: 'OSU, College of Veterinary Medicine',
     when: 'February 2025 — February 2026',
     bullets: ['Data extraction and analysis with OCR pipelines and R.'],
   },
   {
     role: 'IT assistant',
-    co: 'Ohio State University, Fisher College of Business',
+    co: 'OSU, Fisher College of Business',
     when: 'September 2024 — May 2026',
     bullets: ['AV and network install and maintenance.'],
   },
@@ -118,7 +120,7 @@ const EDUCATION = [
     role: 'Dual enrollment',
     co: 'The University of Toledo',
     when: 'August 2023 — May 2024',
-    bullets: ['A lot of math and physics coursework.'],
+    bullets: ['Math and physics coursework.'],
   },
   {
     role: 'Dual enrollment',
@@ -193,7 +195,7 @@ const COURSES: {
   ];
 
 const SKILLS = [
-  { group: 'Languages', items: 'Python, TypeScript, SQL, R, C, Java, Rust, Lean' },
+  { group: 'Languages', items: 'Python, Cpp, TypeScript, SQL, R, C, Java, Rust, Lean' },
   { group: 'Machine learning and data', items: 'pandas, NumPy, scikit-learn, SciPy, spaCy' },
   { group: 'Frameworks', items: 'React, Next.js, FastAPI, LangChain, Supabase' },
   { group: 'Infrastructure and tools', items: 'Git, Linux, Docker, HuggingFace, Pinecone' },
