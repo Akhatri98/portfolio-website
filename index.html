@@ -2,37 +2,247 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Adeel Khatri</title>
-  <meta name="description" content="Adeel Khatri — mathematics and computer science at NYU Courant." />
-  <link rel="icon" type="image/x-icon" href="/favicon.jpeg" />
-
-  <!-- Source Serif for the prose, Plex Mono for the labels. Both have local
-       fallbacks in styles.css, so the page is readable before either lands. -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&amp;display=swap" />
-
-  <script>
-    // Stamp the edition before first paint so the page never flashes the
-    // wrong one: the reader's saved choice, else whatever the system says.
-    (function () {
-      try {
-        var saved = localStorage.getItem('theme');
-        var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.dataset.theme = saved || (dark ? 'dark' : 'light');
-      } catch (e) {
-        document.documentElement.dataset.theme = 'light';
-      }
-    })();
-  </script>
+  <meta name="description" content="Adeel Khatri — mathematics and computer science at NYU Courant.">
+  <link rel="icon" href="favicon.jpeg">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
+
+  <header>
+    <h1>Adeel Khatri</h1>
+    <p>Mathematics &amp; Computer Science @ NYU Courant - New York, NY</p>
+    <p>
+      <a href="mailto:adeelkhatri98@gmail.com">adeelkhatri98@gmail.com</a> ·
+      <a href="mailto:ak14245@nyu.edu">ak14245@nyu.edu</a> ·
+      <a href="https://github.com/Akhatri98">GitHub</a> ·
+      <a href="https://linkedin.com/in/adeelk98">LinkedIn</a> ·
+      <a href="https://x.com/foogiest">X</a>
+    </p>
+    <nav>
+      <a href="#about">About</a> ·
+      <a href="#skills">Skills</a> ·
+      <a href="#education">Education</a> ·
+      <a href="#experience">Experience</a> ·
+      <a href="#projects">Projects</a> ·
+      <a href="#coursework">Coursework</a> ·
+      <a href="#reading">Reading</a>
+    </nav>
+    <input type="checkbox" id="theme">
+    <label for="theme">Toggle dark / light</label>
+  </header>
+
+  <section id="about">
+    <h2>About</h2>
+    <p>I've always been fascinated by how things work under the hood. As a math/CS student, my core drive is
+      optimization. Taking outdated/nonoptimal systems, removing friction, and engineering efficient architectures.</p>
+    <p>On the flip side, I'm a builder at heart. I love rapid prototyping, spinning up a scrappy version of an idea just
+      to get it out of my head and into the world. Once it's alive, that's when I start spending the next stretch of
+      time refining, optimizing, and scaling it into something robust. Whether I'm deep in a theoretical problem or
+      writing code to fix a bottleneck, I just love making things work better.</p>
+    <p>Below is some of the work I've done and continue to pour my time and effort into. Please reach out if you have
+      any questions.</p>
+  </section>
+
+  <section id="skills">
+    <h2>Skills</h2>
+    <ul>
+      <li><b>Languages:</b> Python, Cpp, TypeScript, SQL, R, C, Java, Rust, Lean</li>
+      <li><b>Machine learning and data:</b> pandas, NumPy, scikit-learn, SciPy, spaCy</li>
+      <li><b>Frameworks:</b> React, Next.js, FastAPI, LangChain, Supabase</li>
+      <li><b>Infrastructure and tools:</b> Git, Linux, Docker, HuggingFace, Pinecone</li>
+    </ul>
+  </section>
+
+  <section id="education">
+    <h2>Education</h2>
+
+    <h3>B.A. Mathematics <small>September 2026 — May 2028</small></h3>
+    <p class="sub">New York University</p>
+    <ul>
+      <li>Joint mathematics and computer science program.</li>
+      <li>B.A. / M.S. program</li>
+    </ul>
+
+    <h3>Transfer <small>August 2024 — May 2026</small></h3>
+    <p class="sub">The Ohio State University</p>
+    <ul>
+      <li>Pursued a B.S. in Computer Science &amp; Engineering and a B.S. in Mathematics.</li>
+      <li>Directed reading program in number theory.</li>
+      <li>Point72 Academy.</li>
+    </ul>
+
+    <h3>Dual enrollment <small>August 2023 — May 2024</small></h3>
+    <p class="sub">The University of Toledo</p>
+    <ul>
+      <li>Math and physics coursework.</li>
+    </ul>
+
+    <h3>Dual enrollment <small>January 2022 — July 2023</small></h3>
+    <p class="sub">Bowling Green State University</p>
+    <ul>
+      <li>Spanish courses &amp; GEs.</li>
+    </ul>
+
+    <h3>Honors high school diploma <small>August 2020 — May 2024</small></h3>
+    <p class="sub">Undisclosed</p>
+    <ul>
+      <li>Ranked in the top 5% of the graduating class.</li>
+      <li>AP Scholar with distinction.</li>
+    </ul>
+  </section>
+
+  <section id="experience">
+    <h2>Experience</h2>
+
+    <h3>Engineer <small>May 2026 — present</small></h3>
+    <p class="sub">Biject</p>
+    <ul>
+      <li>Biject Boy.</li>
+    </ul>
+
+    <h3>Software engineering intern <small>June 2025 — August 2025</small></h3>
+    <p class="sub">Hawala</p>
+    <ul>
+      <li>Full-stack development on web applications using React, TypeScript, and Supabase.</li>
+    </ul>
+
+    <h3>Undergraduate research assistant <small>February 2025 — February 2026</small></h3>
+    <p class="sub">OSU, College of Veterinary Medicine</p>
+    <ul>
+      <li>Data extraction and analysis with OCR pipelines and R.</li>
+    </ul>
+
+    <h3>IT assistant <small>September 2024 — May 2026</small></h3>
+    <p class="sub">OSU, Fisher College of Business</p>
+    <ul>
+      <li>AV and network install and maintenance.</li>
+    </ul>
+
+    <h3>MCM coordinator <small>August 2025 — May 2026</small></h3>
+    <p class="sub">SIAM Student Chapter at Ohio State</p>
+    <ul>
+      <li>Event coordination.</li>
+    </ul>
+  </section>
+
+  <section id="projects">
+    <h2>Projects</h2>
+
+    <h3><a href="https://github.com/Akhatri98/mdbh_proofread">Proofread</a> <small>2026</small></h3>
+    <p class="sub">Python, Lean, MongoDB</p>
+
+    <h3><a href="https://github.com/Akhatri98/nytw_mmhacks_finley">Finley, a live-data trading RAG</a>
+      <small>2026</small>
+    </h3>
+    <p class="sub">Python, RAG, Gemini, Pinecone</p>
+
+    <h3><a href="https://github.com/Akhatri98/TF-IDF-news-model">Equity news prediction model</a> <small>2026</small>
+    </h3>
+    <p class="sub">Python, scikit-learn, Flask, Docker</p>
+
+    <h3>Cross-asset momentum allocator <small>2025</small></h3>
+    <p class="sub">Python, pandas, Streamlit</p>
+
+    <h3><a href="https://github.com/Akhatri98/portfolio-website">This website</a> <small>2026</small></h3>
+    <p class="sub">HTML, CSS</p>
+
+    <h3><a href="https://github.com/Akhatri98/NHANES-model">NHANES data analysis</a> <small>2026</small></h3>
+    <p class="sub">Python, pandas, scikit-learn</p>
+
+    <h3><a href="https://internships.akhatri.dev/">Job aggregator</a> <small>2026</small></h3>
+    <p class="sub">Python, Open Crawl, Supabase</p>
+
+    <h3>LangChain Discord agent <small>2025</small></h3>
+    <p class="sub">Python, LangChain, APIs</p>
+
+    <h3><a href="https://github.com/arkanemystic/socraticAI">Socratic AI</a> <small>2025</small></h3>
+    <p class="sub">Flask, TypeScript, n8n</p>
+
+    <p><i>Any project without a link to its source code is private for various reasons. Please reach out if you are
+        interested in learning more.</i></p>
+  </section>
+
+  <section id="coursework">
+    <h2>Coursework</h2>
+
+    <h3>Mathematics</h3>
+    <ul>
+      <li><b>AP Calculus 2</b> — limits, differentiation, integration, series</li>
+      <li><b>Calculus 3</b> — multivariable calculus, partial derivatives, multiple integrals</li>
+      <li><b>Linear Algebra</b> — vector spaces, eigentheory</li>
+      <li><b>Differential Equations</b> — ordinary differential equations, Laplace transforms</li>
+      <li><b>Partial Differential Equations</b> — heat and wave equations, separation of variables, Fourier series</li>
+      <li><b>Abstract Algebra</b> — groups, rings, fields</li>
+      <li><b>Real Analysis</b> — sequences, continuity, metric spaces</li>
+      <li><b>Discrete Math</b> — combinatorics, logic, graph theory, proof techniques</li>
+      <li><b>Probability</b> — combinatorics, random variables, distributions</li>
+      <li><b>Statistics</b> — estimation, hypothesis testing, regression</li>
+    </ul>
+
+    <h3>Computer science</h3>
+    <ul>
+      <li><b>AP Computer Science Principles</b> — computational thinking, basic data, internet principles</li>
+      <li><b>AP Computer Science A</b> — object-oriented programming, Java, basic algorithms</li>
+      <li><b>Intro to OOP</b> — classes, inheritance, polymorphism</li>
+      <li><b>Advanced Web Design</b> — frontend frameworks, responsive layout</li>
+      <li><b>Data Structures</b> — trees, graphs, hashing, memory management</li>
+      <li><b>Computer Architecture</b> — pipelines, memory hierarchy, ISA, digital logic</li>
+      <li><b>Operating Systems</b> — process scheduling, concurrency, memory management, virtual memory</li>
+      <li><b>Database Systems</b> — relational model, SQL, indexing, schema design</li>
+      <li><b>Algorithms</b> — complexity, dynamic programming, greedy algorithms</li>
+      <li><b>Python Programming</b> — syntax, scripts, data structures</li>
+      <li><b>Algorithmic Problem Solving</b> — competitive programming, graph algorithms, dynamic programming, range queries</li>
+      <li><b>Introduction to Computer Security</b> — cryptographic protocols, network, OS, and web security</li>
+      <li><b>Applied Internet Technology</b> — full-stack JavaScript, Node and Express, MongoDB, React, socket.io</li>
+    </ul>
+
+    <h3>Life sciences</h3>
+    <ul>
+      <li><b>AP Biology</b> — cell biology, genetics, evolution, ecology</li>
+      <li><b>AP Chemistry</b> — stoichiometry, thermodynamics, equilibrium, kinetics</li>
+      <li><b>Intro to Psychology</b> — cognition, behavior, research methods</li>
+      <li><b>AP Physics: Mechanics</b> — kinematics, Newtonian dynamics, rotation</li>
+      <li><b>Physics: Electricity &amp; Magnetism</b> — Gauss's law, circuits, Maxwell's equations</li>
+    </ul>
+  </section>
+
+  <section id="reading">
+    <h2>Reading</h2>
+
+    <h3>Currently reading</h3>
+    <ul>
+      <li><i>Essential Topology</i> — M.D. Crossley</li>
+      <li><i>Being and Nothingness</i> — Jean-Paul Sartre</li>
+      <li><i>The Hunchback of Notre-Dame</i> — Victor Hugo</li>
+      <li><i>Statistical Prediction and Machine Learning</i> — J.T. Chen</li>
+    </ul>
+
+    <h3>Read</h3>
+    <ul>
+      <li><i>The Alchemy of Happiness</i> — Al-Ghazali ★★★★★</li>
+      <li><i>Meditations</i> — Marcus Aurelius ★★★</li>
+      <li><i>Fahrenheit 451</i> — Ray Bradbury ★★★★★</li>
+      <li><i>1984</i> — George Orwell ★★★★</li>
+      <li><i>Maxims and Reflections</i> — J.W. von Goethe ★★★</li>
+      <li><i>Elementary Number Theory</i> — G.A. Jones &amp; J.M. Jones ★★★★</li>
+      <li><i>The Quran</i> — Traditional ★★★★★</li>
+      <li><i>Tao Te Ching</i> — Lao Tzu ★★★★</li>
+      <li><i>And a Woodstock in a Birch Tree</i> — Charles M. Schulz ★★★★★</li>
+    </ul>
+
+    <h3>On the shelf</h3>
+    <ul>
+      <li><i>A Concise Course in Algebraic Topology</i> — J.P. May</li>
+      <li><i>Proofs from THE BOOK</i> — M. Aigner &amp; G.M. Ziegler</li>
+      <li><i>The Anduril Thesis</i> — K. Harrison &amp; S. Maini</li>
+      <li><i>The Beginning of Guidance</i> — Al-Ghazali</li>
+    </ul>
+  </section>
+
 </body>
 
 </html>

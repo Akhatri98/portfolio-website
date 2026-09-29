@@ -1,0 +1,51 @@
+html {
+  color-scheme: light dark;
+}
+
+/* The checkbox flips whatever the system theme is. */
+html:has(#theme:checked) {
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:has(#theme:checked) {
+    color-scheme: light;
+  }
+}
+
+#theme {
+  display: none;
+}
+
+label {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+body {
+  max-width: 680px;
+  margin: 40px auto;
+  padding: 0 16px;
+  font-family: Georgia, serif;
+  line-height: 1.6;
+}
+
+h2 {
+  margin-top: 2em;
+  border-bottom: 1px solid;
+}
+
+h3 {
+  margin-bottom: 0;
+  font-size: 1em;
+}
+
+small {
+  float: right;
+  font-weight: normal;
+}
+
+.sub {
+  margin-top: 0;
+  font-style: italic;
+}
