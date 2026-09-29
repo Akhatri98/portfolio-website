@@ -1,8 +1,16 @@
-html {
-  color-scheme: light dark;
+/* Palette */
+:root {
+  --dark: #231F20;
+  --light: #FFFFFF;
+  --accent: #E23840;
 }
 
-/* The checkbox flips whatever the system theme is. */
+html {
+  color-scheme: light dark;
+  background: light-dark(var(--light), var(--dark));
+  color: light-dark(var(--dark), var(--light));
+}
+
 html:has(#theme:checked) {
   color-scheme: dark;
 }
@@ -48,4 +56,13 @@ small {
 .sub {
   margin-top: 0;
   font-style: italic;
+}
+
+a {
+  color: var(--accent);
+}
+
+mark {
+  background: none;
+  color: var(--accent);
 }
