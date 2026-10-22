@@ -66,3 +66,12 @@ mark {
   background: none;
   color: var(--accent);
 }
+
+/* Blog posts */
+pre {
+  overflow-x: auto;
+}
+
+img {
+  max-width: 100%;
+}
