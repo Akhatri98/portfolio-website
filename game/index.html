@@ -100,33 +100,106 @@
       left: 0;
       right: 0;
       bottom: 0;
-      height: 96px;
+      height: 150px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 16px;
+      padding: 0 14px;
       box-sizing: border-box;
       font-family: "Press Start 2P", monospace;
       font-size: 10px;
     }
 
-    #pad div {
-      display: flex;
-      gap: 12px;
-      align-items: center;
+    #pad button {
+      padding: 0;
+      touch-action: none;
     }
 
-    #pad button {
-      border-radius: 50%;
+    #pad .on {
+      background: var(--fg);
+      color: var(--bg);
+    }
+
+    #dpad {
+      position: relative;
+      width: 132px;
+      height: 132px;
+      touch-action: none;
+    }
+
+    #dpad span {
+      position: absolute;
       width: 44px;
       height: 44px;
-      padding: 0;
+      box-sizing: border-box;
+      border: 1px solid;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    #pad .big {
-      width: 68px;
-      height: 68px;
+    #dpad [data-d="up"] {
+      left: 44px;
+      top: 0;
+      border-bottom: 0;
+    }
+
+    #dpad [data-d="down"] {
+      left: 44px;
+      bottom: 0;
+      border-top: 0;
+    }
+
+    #dpad [data-d="left"] {
+      left: 0;
+      top: 44px;
+      border-right: 0;
+    }
+
+    #dpad [data-d="right"] {
+      right: 0;
+      top: 44px;
+      border-left: 0;
+    }
+
+    #dpad .hub {
+      left: 44px;
+      top: 44px;
+      border: 0;
+    }
+
+    #pad .menu {
+      width: 30px;
+      height: 18px;
+      border-radius: 9px;
+      font-size: 8px;
+      align-self: flex-end;
+      margin-bottom: 18px;
+    }
+
+    #face {
+      display: grid;
+      grid-template-columns: 62px 62px;
+      gap: 12px 10px;
+      justify-items: center;
+    }
+
+    #face .shoulder {
+      width: 56px;
+      height: 26px;
+      border-radius: 13px;
+    }
+
+    #face .big {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
       font-size: 14px;
+    }
+
+    #face [data-a="b"] {
+      transform: translateY(16px);
     }
   </style>
 </head>
@@ -136,12 +209,17 @@
   <canvas id="c"></canvas>
 
   <div id="pad" hidden>
-    <div>
-      <button data-a="menu">≡</button>
-      <button data-a="lb">REST</button>
-      <button data-a="rb">MAP</button>
+    <div id="dpad">
+      <span data-d="up">▲</span>
+      <span data-d="left">◀</span>
+      <span class="hub"></span>
+      <span data-d="right">▶</span>
+      <span data-d="down">▼</span>
     </div>
-    <div>
+    <button class="menu" data-a="menu">≡</button>
+    <div id="face">
+      <button class="shoulder" data-a="lb">LB</button>
+      <button class="shoulder" data-a="rb">RB</button>
       <button class="big" data-a="b">B</button>
       <button class="big" data-a="a">A</button>
     </div>
@@ -788,9 +866,23 @@
     cv.addEventListener('pointerup', () => pointer = null);
     cv.addEventListener('pointercancel', () => pointer = null);
     for (const btn of $('pad').querySelectorAll('button')) {
-      btn.addEventListener('pointerdown', e => { e.preventDefault(); touchDown.add(btn.dataset.a); });
-      for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) btn.addEventListener(ev, () => touchDown.delete(btn.dataset.a));
+      btn.addEventListener('pointerdown', e => { e.preventDefault(); touchDown.add(btn.dataset.a); btn.classList.add('on'); });
+      for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) btn.addEventListener(ev, () => { touchDown.delete(btn.dataset.a); btn.classList.remove('on'); });
     }
+
+    const dpad = $('dpad');
+    function steer(e) {
+      const r = dpad.getBoundingClientRect(), dx = e.clientX - r.left - r.width / 2, dy = e.clientY - r.top - r.height / 2;
+      for (const d in STEPS) touchDown.delete(d);
+      if (Math.hypot(dx, dy) > 10) touchDown.add(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'));
+      for (const s of dpad.children) s.classList.toggle('on', touchDown.has(s.dataset.d));
+    }
+    dpad.addEventListener('pointerdown', e => { e.preventDefault(); dpad.setPointerCapture(e.pointerId); steer(e); });
+    dpad.addEventListener('pointermove', e => { if (dpad.hasPointerCapture(e.pointerId)) steer(e); });
+    for (const ev of ['pointerup', 'pointercancel']) dpad.addEventListener(ev, () => {
+      for (const d in STEPS) touchDown.delete(d);
+      for (const s of dpad.children) s.classList.remove('on');
+    });
 
     function drawMenu() {
       $('binds').innerHTML = '';
@@ -820,7 +912,8 @@
     const g = cv.getContext('2d');
     const vc = document.createElement('canvas');
     const v = vc.getContext('2d');
-    let W, H, K, VW, VH, padH;
+    const logLines = touch ? 2 : 3, logH = logLines * 11 + 6;
+    let W, H, K, VW, VH, padH, low;
     function resize() {
       const dpr = devicePixelRatio || 1;
       W = cv.width = Math.round(innerWidth * dpr);
@@ -828,7 +921,9 @@
       K = Math.max(2, Math.round(Math.min(W, H) / 215));
       VW = Math.ceil(W / K); VH = Math.ceil(H / K);
       vc.width = VW; vc.height = VH;
-      padH = touch ? Math.ceil(96 * dpr / K) : 0;
+      padH = touch ? Math.ceil(150 * dpr / K) : 0;
+      low = touch ? padH + logH : 0;
+      $('pad').style.bottom = (logH * K - (VH * K - H)) / dpr + 'px';
     }
     addEventListener('resize', resize);
     resize();
@@ -960,7 +1055,7 @@
 
     function centred(lines, cols) {
       const out = lines.flatMap(([str, color]) => str ? wrap(str, cols - 1).map(l => [l, color]) : [['', color]]);
-      const top = Math.max(10, Math.round((VH - padH) / 2 - out.length * 7));
+      const top = Math.max(10, Math.round((VH - low) / 2 - out.length * 7));
       out.forEach(([str, color], i) => words(str, Math.round((VW - str.length * 8) / 2), top + i * 14, color));
     }
 
@@ -1006,7 +1101,7 @@
     }
 
     function drawFloor(cols) {
-      const p = run.p, hudH = 14, logLines = 3, logH = logLines * 11 + 6;
+      const p = run.p, hudH = 14;
       const mapH = VH - hudH - logH - padH;
       const px = Math.round(VW / 2 - T / 2), py = Math.round(hudH + mapH / 2 - T / 2);
       const ox = px - p.x * T, oy = py - p.y * T;
@@ -1044,7 +1139,7 @@
       for (const part of parts) { words(part, x, 3, part === hpText && (p.hp < stat.max() / 3 || p.poison) ? RED : ink); x += part.length * 8 + 8; }
       if (p.poison && x + 24 < VW) words('PSN', x, 3, RED);
 
-      const top = VH - logH - padH;
+      const top = VH - logH;
       box(0, top, VW, logH);
       const lines = run.log.slice(-6).flatMap(l => wrap(l, cols - 1)).slice(-logLines);
       lines.forEach((l, i) => words(l, 5, top + 4 + i * 11, i === lines.length - 1 ? ink : '#8E8A8B'));
@@ -1057,7 +1152,7 @@
       ...(screen === 'bag' ? [['Wield: ' + itemName(p.weapon), '#8E8A8B'], ['Wear: ' + (p.armor ? itemName(p.armor) : 'nothing'), '#8E8A8B']] : []),
       [help, '#8E8A8B']].flatMap(([l, c]) => l ? wrap(l, fit).map(s => [s, c]) : picked ? [['', c]] : []);
       const rows = Math.max(items.length, 1), h = 24 + rows * 11 + 6 + notes.length * 10 + 4;
-      const x = Math.round((VW - w) / 2), y = Math.max(16, Math.round((VH - padH - h) / 2));
+      const x = Math.round((VW - w) / 2), y = Math.max(16, Math.round((VH - low - h) / 2));
       box(x, y, w, h);
       words(title, x + 6, y + 6);
       listBox = { y: y + 22 - 2 };
@@ -1070,8 +1165,8 @@
     }
 
     function drawMap() {
-      const k = Math.max(1, Math.floor(Math.min((VW - 8) / MW, (VH - padH - 30) / MH)));
-      const x0 = Math.round((VW - MW * k) / 2), y0 = Math.round((VH - padH - MH * k) / 2) + 6;
+      const k = Math.max(1, Math.floor(Math.min((VW - 8) / MW, (VH - low - 30) / MH)));
+      const x0 = Math.round((VW - MW * k) / 2), y0 = Math.round((VH - low - MH * k) / 2) + 6;
       box(x0 - 4, y0 - 16, MW * k + 8, MH * k + 20);
       words('FLOOR ' + run.depth, x0, y0 - 12);
       for (let y = 0; y < MH; y++) for (let x = 0; x < MW; x++) {
