@@ -160,6 +160,7 @@
     const T = 8;
     const MW = 44, MH = 30;
     const SIGHT = 7;
+    const DEEP_HP = 0.03, DEEP_ATK = 0.3, PAST_ATK = 0.4, MAX_EXTRA = 14;
     const FONT = '8px "Press Start 2P", monospace';
     const RED = '#E23840';
 
@@ -189,7 +190,7 @@
     }
     const pick = (r, list) => list[Math.floor(r() * list.length)];
 
-    const meta = { best: 0, runs: 0, unlocks: [], kills: 0, deaths: 0, deepest: 0, giant: false, dragon: false, known: [] };
+    const meta = { best: 0, runs: 0, unlocks: [], kills: 0, deaths: 0, deepest: 0, giant: false, champion: false, dragon: false, known: [] };
 
     const UNLOCKS = [
       { id: 'satchel', name: 'Satchel', text: 'start with a healing potion', when: () => meta.deepest >= 3 },
@@ -197,7 +198,9 @@
       { id: 'hearty', name: 'Hearty', text: '+5 max HP', when: () => meta.kills >= 25 },
       { id: 'blade', name: "Giant's blade", text: 'start with a sword', when: () => meta.giant },
       { id: 'cartographer', name: 'Cartographer', text: 'start with a scroll of mapping', when: () => meta.deepest >= 8 },
-      { id: 'slayer', name: 'Dragonslayer', text: '+1 attack', when: () => meta.dragon },
+      { id: 'trophy', name: 'Trophy', text: 'your starting weapon is +1', when: () => meta.champion },
+      { id: 'lantern', name: 'Lantern', text: 'see 2 tiles further', when: () => meta.deepest >= 15 },
+      { id: 'slayer', name: 'Dragonslayer', text: '+2 attack', when: () => meta.dragon },
     ];
     const unlocked = id => meta.unlocks.includes(id);
 
@@ -207,11 +210,25 @@
       return fresh;
     }
 
-    const WEAPONS = [{ name: 'Dagger', atk: 1 }, { name: 'Sword', atk: 3 }, { name: 'Spear', atk: 4 }, { name: 'Axe', atk: 5 }];
-    const ARMORS = [{ name: 'Leather', def: 1 }, { name: 'Chain mail', def: 2 }, { name: 'Plate', def: 3 }];
+    const WEAPONS = [
+      { name: 'Dagger', atk: 1, trait: 'sneak', text: 'never misses, and does triple damage to sleeping enemies' },
+      { name: 'Sword', atk: 4, trait: 'parry', text: 'parries 1 in 4 hits from enemies next to you' },
+      { name: 'Spear', atk: 3, trait: 'pierce', text: 'also hits whatever stands right behind your target' },
+      { name: 'Axe', atk: 3, trait: 'cleave', text: 'hits every enemy next to you at once' },
+    ];
+    const ARMORS = [
+      { name: 'Leather', def: 1, trait: 'quiet', text: 'light, so sleeping enemies are slow to notice you' },
+      { name: 'Chain mail', def: 2, trait: 'deflect', text: 'halves damage from arrows and fire' },
+      { name: 'Plate', def: 4, trait: 'loud', text: 'heavy, so enemies wake the moment they see you' },
+    ];
     const MODS = { keen: 'often hits twice as hard', vampiric: 'heals you when it hits', heavy: '+2 attack' };
     const POTIONS = { heal: 'healing', strength: 'strength', vigor: 'vigor', poison: 'poison', clarity: 'clarity' };
     const SCROLLS = { map: 'mapping', teleport: 'teleport', blast: 'blasting', enchant: 'enchanting' };
+    const USES = {
+      heal: 'Heals half your HP and cures poison.', strength: '+1 attack for the rest of the run.', vigor: '+5 max HP.',
+      poison: 'Poisons you. Best dropped.', clarity: 'Tells you what everything you carry does.', map: 'Shows the whole floor.',
+      teleport: 'Takes you somewhere random on the floor.', blast: 'Burns every enemy in sight.', enchant: 'Gives your weapon +1.',
+    };
 
     function looks(day) {
       const r = rng(hashStr(day + 'looks'));
@@ -230,13 +247,25 @@
       return it.kind === 'potion' ? 'potion of ' + POTIONS[it.id] : 'scroll of ' + SCROLLS[it.id];
     }
 
+    const weaponAtk = w => WEAPONS[w.base].atk + w.plus + (w.mod === 'heavy' ? 2 : 0);
+
+    function describe(it) {
+      if (it.kind === 'weapon') return 'Attack +' + weaponAtk(it) + '. ' + cap(WEAPONS[it.base].text) + '.' + (it.mod ? ' ' + cap(MODS[it.mod]) + '.' : '');
+      if (it.kind === 'armor') return 'Defense +' + (ARMORS[it.base].def + it.plus) + '. ' + cap(ARMORS[it.base].text) + '.';
+      return run.known.includes(it.id) ? USES[it.id] : 'Unknown. Use it to find out.';
+    }
+
+    function rollGear(r, depth, kind) {
+      const plus = Math.floor(r() * (depth / 4 + 1)) - (r() < 0.15 ? 1 : 0);
+      if (kind === 'weapon') return { kind, base: depth < 3 || r() < 0.2 ? 0 : 1 + Math.floor(r() * 3), plus, mod: r() < 0.25 ? pick(r, Object.keys(MODS)) : null };
+      return { kind, base: Math.min(2, Math.floor(r() * (1.2 + depth / 5))), plus };
+    }
+
     function rollItem(r, depth) {
       const k = r();
       if (k < 0.38) return { kind: 'potion', id: pick(r, ['heal', 'heal', 'heal', 'strength', 'vigor', 'poison', 'clarity']) };
       if (k < 0.62) return { kind: 'scroll', id: pick(r, ['map', 'teleport', 'blast', 'blast', 'enchant']) };
-      const plus = Math.floor(r() * (depth / 4 + 1)) - (r() < 0.15 ? 1 : 0);
-      if (k < 0.82) return { kind: 'weapon', base: Math.min(3, Math.floor(r() * (1.5 + depth / 3))), plus, mod: r() < 0.25 ? pick(r, Object.keys(MODS)) : null };
-      return { kind: 'armor', base: Math.min(2, Math.floor(r() * (1.2 + depth / 5))), plus };
+      return rollGear(r, depth, k < 0.82 ? 'weapon' : 'armor');
     }
 
     const price = it => it.kind === 'potion' || it.kind === 'scroll' ? 15 : it.kind === 'weapon' ? 20 + WEAPONS[it.base].atk * 8 + it.plus * 10 : 25 + ARMORS[it.base].def * 12 + it.plus * 10;
@@ -245,21 +274,37 @@
       const pool = Object.entries(ENEMIES).filter(([, e]) => !e.boss && e.floors[0] <= depth && depth <= e.floors[1]);
       let roll = r() * pool.reduce((s, [, e]) => s + (e.weight || 1), 0), key = pool[0][0];
       for (const [k, e] of pool) if ((roll -= e.weight || 1) <= 0) { key = k; break; }
-      const e = ENEMIES[key], past = depth - e.floors[0], hp = Math.round(e.hp * (1 + past * 0.15));
-      return { key, ...at, hp, max: hp, atk: e.atk + Math.floor(past / 2), def: e.def + Math.floor(past / 4), awake: false, energy: 0 };
+      const e = ENEMIES[key], past = depth - e.floors[0], deep = Math.max(0, depth - 10);
+      const hp = Math.round(e.hp * (1 + past * 0.15) * (1 + deep * DEEP_HP));
+      return {
+        key, ...at, hp, max: hp, atk: Math.floor(e.atk + past * PAST_ATK + deep * DEEP_ATK), def: Math.floor(e.def + past * 0.25 + deep * 0.1),
+        xp: Math.round(e.xp * (1 + past * 0.08)), awake: false, energy: 0,
+      };
+    }
+
+    function bossFor(depth) {
+      const here = Object.keys(ENEMIES).filter(k => {
+        const e = ENEMIES[k];
+        return e.boss && (depth === e.boss || (e.every && depth > e.boss && (depth - e.boss) % e.every === 0));
+      });
+      return here.sort((a, b) => (ENEMIES[b].every || Infinity) - (ENEMIES[a].every || Infinity))[0] || null;
     }
 
     function genFloor(depth) {
       const r = rng(hashStr(run.day) ^ Math.imul(depth, 0x9E3779B1));
       const g = Array.from({ length: MH }, () => Array(MW).fill('#'));
+      const bossKey = bossFor(depth), boss = bossKey && ENEMIES[bossKey], big = !!boss && (boss.size || 1) > 1;
+      const roomW = big ? MW - 20 : MW;
       const rooms = [];
       for (let i = 0; i < 80 && rooms.length < 10; i++) {
         const w = 4 + Math.floor(r() * 7), h = 3 + Math.floor(r() * 5);
-        const x = 1 + Math.floor(r() * (MW - w - 2)), y = 1 + Math.floor(r() * (MH - h - 2));
+        const x = 1 + Math.floor(r() * (roomW - w - 2)), y = 1 + Math.floor(r() * (MH - h - 2));
         if (rooms.some(o => x < o.x + o.w + 1 && o.x < x + w + 1 && y < o.y + o.h + 1 && o.y < y + h + 1)) continue;
         rooms.push({ x, y, w, h, cx: x + (w >> 1), cy: y + (h >> 1) });
       }
       rooms.sort((a, b) => a.cx - b.cx);
+      const lair = big ? { x: MW - 18, y: (MH >> 1) - 6, w: 16, h: 12, cx: MW - 10, cy: MH >> 1 } : null;
+      if (lair) rooms.push(lair);
       for (const rm of rooms) for (let y = rm.y; y < rm.y + rm.h; y++) for (let x = rm.x; x < rm.x + rm.w; x++) g[y][x] = '.';
       const dig = (a, b) => {
         const flip = r() < 0.5;
@@ -270,13 +315,15 @@
       };
       for (let i = 1; i < rooms.length; i++) dig(rooms[i - 1], rooms[i]);
       for (let i = 0; i < 2; i++) dig(pick(r, rooms), pick(r, rooms));
+      if (lair) for (const [i, j] of [[4, 3], [11, 3], [4, 8], [11, 8]]) g[lair.y + j][lair.x + i] = '#';
 
-      const start = rooms[0], end = rooms[rooms.length - 1];
-      g[end.cy][end.cx] = '>';
-      const used = new Set([start.cx + ',' + start.cy, end.cx + ',' + end.cy]);
+      const start = rooms[0], end = rooms[rooms.length - 1], open = lair ? rooms.slice(0, -1) : rooms;
+      const stairs = lair ? { x: lair.x + lair.w - 2, y: lair.cy } : { x: end.cx, y: end.cy };
+      g[stairs.y][stairs.x] = '>';
+      const used = new Set([start.cx + ',' + start.cy, stairs.x + ',' + stairs.y]);
       const spot = (avoidStart = true) => {
         for (let i = 0; i < 100; i++) {
-          const rm = avoidStart ? rooms[1 + Math.floor(r() * (rooms.length - 1))] : pick(r, rooms);
+          const rm = avoidStart && open.length > 1 ? open[1 + Math.floor(r() * (open.length - 1))] : pick(r, open);
           const x = rm.x + Math.floor(r() * rm.w), y = rm.y + Math.floor(r() * rm.h);
           if (g[y][x] === '.' && !used.has(x + ',' + y)) { used.add(x + ',' + y); return { x, y }; }
         }
@@ -284,15 +331,24 @@
       };
 
       const monsters = [];
-      const cycle = Math.floor((depth - 1) / 10), bossKey = Object.keys(ENEMIES).find(k => ENEMIES[k].boss === (depth - 1) % 10 + 1);
       if (bossKey) {
-        const e = ENEMIES[bossKey];
-        monsters.push({ key: bossKey, x: end.cx - 1, y: end.cy, hp: e.hp * (1 + cycle), atk: e.atk + cycle * 4, def: e.def + cycle * 2, awake: false, energy: 0, boss: true });
-        monsters[0].max = monsters[0].hp;
+        const past = depth - boss.boss, s = boss.size || 1;
+        const at = lair ? { x: end.cx - 1, y: end.cy - 1 } : { x: end.cx - 1, y: end.cy };
+        const hp = Math.round(boss.hp * (1 + past * 0.12));
+        monsters.push({
+          key: bossKey, ...at, hp, max: hp, atk: Math.round(boss.atk + past * 0.6), def: Math.round(boss.def + past * 0.25),
+          xp: Math.round(boss.xp * (1 + past * 0.1)), awake: false, energy: 0, boss: true, tick: 0,
+        });
+        for (let j = 0; j < s; j++) for (let i = 0; i < s; i++) used.add((at.x + i) + ',' + (at.y + j));
       }
-      for (let i = 0; i < 4 + depth; i++) {
+      for (let i = 0; i < (4 + Math.min(depth, MAX_EXTRA)) / (lair ? 2 : 1); i++) {
         const at = spot();
-        if (at) monsters.push(spawn(r, depth, at));
+        if (!at) continue;
+        const m = spawn(r, depth, at), s = ENEMIES[m.key].size || 1, rest = [];
+        for (let j = 0; j < s; j++) for (let k = 0; k < s; k++) if (j || k) rest.push((at.x + k) + ',' + (at.y + j));
+        if (rest.some(t => used.has(t) || g[+t.split(',')[1]][+t.split(',')[0]] !== '.')) continue;
+        rest.forEach(t => used.add(t));
+        monsters.push(m);
       }
 
       const items = [];
@@ -307,7 +363,7 @@
 
       return {
         depth, g, seen: Array.from({ length: MH }, () => Array(MW).fill(0)), monsters, items, merchant,
-        start: { x: start.cx, y: start.cy }, sealed: !!bossKey,
+        start: { x: start.cx, y: start.cy }, sealed: !!bossKey, fire: new Map(), warn: new Set(),
       };
     }
 
@@ -315,18 +371,20 @@
 
     const stat = {
       max: () => 20 + (run.p.level - 1) * 4 + run.p.vigor + (unlocked('hearty') ? 5 : 0),
-      atk: () => 2 + run.p.level + run.p.str + (unlocked('slayer') ? 1 : 0) +
-        (run.p.weapon ? WEAPONS[run.p.weapon.base].atk + run.p.weapon.plus + (run.p.weapon.mod === 'heavy' ? 2 : 0) : 0),
-      def: () => Math.floor(run.p.level / 3) + (run.p.armor ? ARMORS[run.p.armor.base].def + run.p.armor.plus : 0),
+      atk: () => 2 + run.p.level + run.p.str + (unlocked('slayer') ? 2 : 0) + (run.p.weapon ? weaponAtk(run.p.weapon) : 0),
+      def: () => run.p.armor ? ARMORS[run.p.armor.base].def + run.p.armor.plus : 0,
     };
     const needXp = level => 8 + level * 8;
+    const trait = () => run.p.weapon && WEAPONS[run.p.weapon.base].trait;
+    const wearing = () => run.p.armor && ARMORS[run.p.armor.base].trait;
+    const damage = (atk, def) => Math.max(1, Math.round(atk * atk / (atk + Math.max(0, def)) * (0.85 + Math.random() * 0.3)));
 
     function newRun() {
       run = {
         day: today, depth: 1, turns: 0, kills: 0, log: [], looks: looks(today), known: [...meta.known],
         p: {
           x: 0, y: 0, hp: 1, level: 1, xp: 0, str: 0, vigor: 0, poison: 0, gold: 0, inv: [],
-          weapon: { kind: 'weapon', base: unlocked('blade') ? 1 : 0, plus: 0, mod: null },
+          weapon: { kind: 'weapon', base: unlocked('blade') ? 1 : 0, plus: unlocked('trophy') ? 1 : 0, mod: null },
           armor: unlocked('leathers') ? { kind: 'armor', base: 0, plus: 0 } : null
         },
       };
@@ -345,7 +403,10 @@
       meta.deepest = Math.max(meta.deepest, depth);
       meta.best = Math.max(meta.best, depth);
       look();
-      if (floor.sealed) say('A heavy presence fills this floor. The stairs are sealed.');
+      const b = floor.monsters.find(m => m.boss), e = b && ENEMIES[b.key];
+      if (!b) return;
+      if (e.size > 1) say('Heat rolls out of a great hall ahead. The stairs are sealed.');
+      else say('A heavy presence fills this floor. The stairs are sealed.');
     }
 
     function say(text) {
@@ -354,16 +415,29 @@
     }
 
     const tile = (x, y) => (floor.g[y] && floor.g[y][x]) || '#';
-    const monsterAt = (x, y) => floor.monsters.find(m => m.x === x && m.y === y);
-    const blocks = (x, y) => tile(x, y) === '#' || !!monsterAt(x, y) || (floor.merchant && floor.merchant.x === x && floor.merchant.y === y);
+    const size = m => ENEMIES[m.key].size || 1;
+    const covers = (m, x, y) => x >= m.x && x < m.x + size(m) && y >= m.y && y < m.y + size(m);
+    const monsterAt = (x, y) => floor.monsters.find(m => covers(m, x, y));
+    const merchantAt = (x, y) => !!floor.merchant && floor.merchant.x === x && floor.merchant.y === y;
+    const blocks = (x, y) => tile(x, y) === '#' || !!monsterAt(x, y) || merchantAt(x, y);
+    const gap = (p, a, s) => p < a ? p - a : p > a + s - 1 ? p - (a + s - 1) : 0;
+    const offset = m => [gap(run.p.x, m.x, size(m)), gap(run.p.y, m.y, size(m))];
+
+    function canStand(m, x, y) {
+      for (let j = 0; j < size(m); j++) for (let i = 0; i < size(m); i++) {
+        const tx = x + i, ty = y + j, o = monsterAt(tx, ty);
+        if (tile(tx, ty) === '#' || merchantAt(tx, ty) || (o && o !== m) || (tx === run.p.x && ty === run.p.y)) return false;
+      }
+      return true;
+    }
 
     function look() {
       view = new Set();
-      const { x: px, y: py } = run.p;
+      const { x: px, y: py } = run.p, sight = SIGHT + (unlocked('lantern') ? 2 : 0);
       for (let a = 0; a < 360; a += 2) {
         const dx = Math.cos(a * Math.PI / 180), dy = Math.sin(a * Math.PI / 180);
         let x = px + 0.5, y = py + 0.5;
-        for (let i = 0; i <= SIGHT; i++) {
+        for (let i = 0; i <= sight; i++) {
           const tx = Math.floor(x), ty = Math.floor(y);
           if (ty < 0 || ty >= MH || tx < 0 || tx >= MW) break;
           view.add(tx + ',' + ty);
@@ -378,30 +452,47 @@
     function name(m) { return 'the ' + ENEMIES[m.key].name.toLowerCase(); }
     const cap = s => s[0].toUpperCase() + s.slice(1);
 
+    const spotted = m => {
+      for (let j = 0; j < size(m); j++) for (let i = 0; i < size(m); i++) if (visible(m.x + i, m.y + j)) return true;
+      return false;
+    };
+
+    function attack(dir) {
+      const p = run.p, [dx, dy] = STEPS[dir], targets = [monsterAt(p.x + dx, p.y + dy)];
+      const add = o => o && !targets.includes(o) && targets.push(o);
+      if (trait() === 'cleave') for (const [ox, oy] of Object.values(STEPS)) add(monsterAt(p.x + ox, p.y + oy));
+      if (trait() === 'pierce') add(monsterAt(p.x + dx * 2, p.y + dy * 2));
+      for (const m of targets) if (run && floor.monsters.includes(m)) hitMonster(m);
+    }
+
     function hitMonster(m) {
-      const w = run.p.weapon;
-      if (Math.random() < 0.1) return say('You miss ' + name(m) + '.');
+      const w = run.p.weapon, sneak = trait() === 'sneak' && !m.awake;
+      if (trait() !== 'sneak' && Math.random() < 0.1) return say('You miss ' + name(m) + '.');
       const crit = Math.random() < (w && w.mod === 'keen' ? 0.25 : 0.06);
-      const dmg = Math.max(1, stat.atk() + rint(-1, 1) - m.def) * (crit ? 2 : 1);
+      const dmg = damage(stat.atk(), m.def) * (sneak ? 3 : crit ? 2 : 1);
       m.hp -= dmg;
       m.awake = true;
       m.flash = 0.2;
       if (w && w.mod === 'vampiric') run.p.hp = Math.min(stat.max(), run.p.hp + 1);
-      if (m.hp > 0) return say((crit ? 'A great hit! ' : '') + 'You hit ' + name(m) + ' for ' + dmg + '.');
+      if (m.hp > 0) return say((sneak ? 'A sneak attack! ' : crit ? 'A great hit! ' : '') + 'You hit ' + name(m) + ' for ' + dmg + '.');
       kill(m);
     }
 
     function kill(m) {
+      const e = ENEMIES[m.key], s = size(m);
       floor.monsters.splice(floor.monsters.indexOf(m), 1);
       say(cap(name(m)) + ' dies.');
       run.kills++;
       meta.kills++;
-      gainXp(ENEMIES[m.key].xp);
+      gainXp(m.xp || e.xp);
       if (m.boss) {
         floor.sealed = false;
         if (m.key === 'giant') meta.giant = true;
         if (m.key === 'dragon') meta.dragon = true;
-        say('The stairs grind open.');
+        if (run.depth === 10) meta.champion = true;
+        for (let i = 0; i < (s > 1 ? 3 : 1); i++) floor.items.push({ x: m.x + i % s, y: m.y + (i >> 1), item: rollGear(Math.random, run.depth + 4, Math.random() < 0.6 ? 'weapon' : 'armor') });
+        floor.items.push({ x: m.x + s - 1, y: m.y + s - 1, gold: (s > 1 ? 60 : 20) + run.depth * 5 });
+        say((s > 1 ? 'Its hoard spills across the floor. ' : 'It drops something. ') + 'The stairs grind open.');
       }
     }
 
@@ -417,46 +508,74 @@
       }
     }
 
-    function hitPlayer(m, shot) {
-      if (Math.random() < 0.2) return say(cap(name(m)) + (shot ? ' shoots and misses.' : ' misses.'));
-      const dmg = Math.max(1, m.atk + rint(-1, 1) - stat.def());
+    function hitPlayer(m, how) {
+      const verb = how === 'breath' ? ' breathes fire' : how ? ' shoots' : '';
+      if (how !== 'breath' && Math.random() < 0.2) return say(cap(name(m)) + (how ? verb + ' and misses.' : ' misses.'));
+      if (!how && trait() === 'parry' && Math.random() < 0.25) return say('You parry ' + name(m) + '.');
+      let dmg = damage(m.atk, stat.def());
+      if (how && wearing() === 'deflect') dmg = Math.ceil(dmg / 2);
       run.p.hp -= dmg;
       run.p.flash = 0.25;
-      say(cap(name(m)) + (shot ? ' shoots you for ' : ' hits you for ') + dmg + '.');
+      say(cap(name(m)) + (how ? verb + ' at you for ' : ' hits you for ') + dmg + '.');
       if (ENEMIES[m.key].poison && Math.random() < ENEMIES[m.key].poison && !run.p.poison) { run.p.poison = 5; say('You are poisoned!'); }
       if (run.p.hp <= 0) die('Killed by ' + ENEMIES[m.key].name.toLowerCase());
     }
 
-    function stepToward(m, tx, ty, away) {
-      const dx = Math.sign(tx - m.x) * (away ? -1 : 1), dy = Math.sign(ty - m.y) * (away ? -1 : 1);
-      const options = Math.abs(tx - m.x) > Math.abs(ty - m.y) ? [[dx, 0], [0, dy]] : [[0, dy], [dx, 0]];
-      for (const [ox, oy] of options) {
-        if ((ox || oy) && !blocks(m.x + ox, m.y + oy) && !(m.x + ox === run.p.x && m.y + oy === run.p.y)) { m.x += ox; m.y += oy; return; }
-      }
+    function stepToward(m, away) {
+      const [gx, gy] = offset(m), dx = Math.sign(gx) * (away ? -1 : 1), dy = Math.sign(gy) * (away ? -1 : 1);
+      const options = Math.abs(gx) > Math.abs(gy) ? [[dx, 0], [0, dy]] : [[0, dy], [dx, 0]];
+      for (const [ox, oy] of options) if ((ox || oy) && canStand(m, m.x + ox, m.y + oy)) { m.x += ox; m.y += oy; return; }
+      if (size(m) > 1) randomStep(m);
     }
 
     function randomStep(m) {
       const [ox, oy] = Object.values(STEPS)[rint(0, 3)];
-      if (!blocks(m.x + ox, m.y + oy) && !(m.x + ox === run.p.x && m.y + oy === run.p.y)) { m.x += ox; m.y += oy; }
+      if (canStand(m, m.x + ox, m.y + oy)) { m.x += ox; m.y += oy; }
     }
 
-    function clearShot(m) {
-      const dx = Math.sign(run.p.x - m.x), dy = Math.sign(run.p.y - m.y);
-      for (let x = m.x + dx, y = m.y + dy; x !== run.p.x || y !== run.p.y; x += dx, y += dy) if (blocks(x, y)) return false;
+    function lineTo(m) {
+      const s = size(m), sx = clamp(run.p.x, m.x, m.x + s - 1), sy = clamp(run.p.y, m.y, m.y + s - 1);
+      const dx = Math.sign(run.p.x - sx), dy = Math.sign(run.p.y - sy), line = [];
+      if (dx && dy) return null;
+      for (let x = sx + dx, y = sy + dy; ; x += dx, y += dy) {
+        line.push([x, y]);
+        if (x === run.p.x && y === run.p.y) return line;
+        if (blocks(x, y)) return null;
+      }
+    }
+
+    function breatheFire(m, e, d) {
+      if (!spotted(m)) m.hp = Math.min(m.max, m.hp + Math.ceil(m.max / 100));
+      if (m.tick % 4 === 0 && d <= 9) {
+        const p = run.p;
+        floor.warn.add(p.x + ',' + p.y);
+        for (let n = 0; n < 12 && floor.warn.size < 6; n++) {
+          const x = p.x + rint(-2, 2), y = p.y + rint(-2, 2);
+          if (tile(x, y) !== '#') floor.warn.add(x + ',' + y);
+        }
+        say(cap(name(m)) + ' roars. Embers rain down around you!');
+        return true;
+      }
+      const line = m.tick % 2 === 1 && d > 1 && d <= e.range && lineTo(m);
+      if (!line) return false;
+      for (const [x, y] of line) floor.fire.set(x + ',' + y, 3);
+      hitPlayer(m, 'breath');
       return true;
     }
 
     function monsterTurn(m) {
-      const e = ENEMIES[m.key], p = run.p;
-      if (visible(m.x, m.y)) m.awake = true;
+      const e = ENEMIES[m.key];
+      if (!m.awake && spotted(m) && (m.boss || Math.random() < ({ quiet: 0.25, loud: 1 }[wearing()] || 0.5))) m.awake = true;
       if (!m.awake) { if (Math.random() < 0.3) randomStep(m); return; }
-      const dx = p.x - m.x, dy = p.y - m.y, d = Math.abs(dx) + Math.abs(dy);
-      if (e.ai === 'ranged' && (dx === 0 || dy === 0) && d > 1 && d <= e.range && clearShot(m)) return hitPlayer(m, true);
+      m.tick = (m.tick || 0) + 1;
+      const [dx, dy] = offset(m), d = Math.abs(dx) + Math.abs(dy);
+      if (e.fire && breatheFire(m, e, d)) return;
+      if (e.ai === 'ranged' && (dx === 0 || dy === 0) && d > 1 && d <= e.range && lineTo(m)) return hitPlayer(m, 'shot');
       if (d === 1) return hitPlayer(m);
       if (e.ai === 'erratic' && Math.random() < 0.5) return randomStep(m);
-      if (e.ai === 'ranged' && d < 3) return stepToward(m, p.x, p.y, true);
-      if (e.ai === 'coward' && m.hp < m.max * 0.3) return stepToward(m, p.x, p.y, true);
-      stepToward(m, p.x, p.y);
+      if (e.ai === 'ranged' && d < 3) return stepToward(m, true);
+      if (e.ai === 'coward' && m.hp < m.max * 0.3) return stepToward(m, true);
+      stepToward(m);
     }
 
     function endTurn() {
@@ -466,13 +585,25 @@
         p.poison--;
         p.hp--;
         if (p.hp <= 0) return die('Died of poison');
-      } else if (run.turns % 15 === 0) p.hp = Math.min(stat.max(), p.hp + 1);
+      } else if (run.turns % 15 === 0) p.hp = Math.min(stat.max(), p.hp + 1 + Math.floor(p.level / 8));
+      for (const k of floor.warn) floor.fire.set(k, 4);
+      floor.warn.clear();
+      if (floor.fire.has(p.x + ',' + p.y)) {
+        const burn = Math.ceil((3 + Math.floor(run.depth / 4)) / (wearing() === 'deflect' ? 2 : 1));
+        p.hp -= burn;
+        p.flash = 0.25;
+        say('The fire burns you for ' + burn + '.');
+        if (p.hp <= 0) return die('Burned to death');
+      }
+      for (const [k, t] of floor.fire) t > 1 ? floor.fire.set(k, t - 1) : floor.fire.delete(k);
       look();
       if (run.turns % 50 === 0 && Math.random() < 0.6) {
         for (let n = 0; n < 50; n++) {
           const x = rint(1, MW - 2), y = rint(1, MH - 2);
           if (tile(x, y) !== '.' || blocks(x, y) || visible(x, y)) continue;
-          floor.monsters.push({ ...spawn(Math.random, run.depth, { x, y }), awake: true });
+          const m = { ...spawn(Math.random, run.depth, { x, y }), awake: true };
+          if (!canStand(m, x, y)) continue;
+          floor.monsters.push(m);
           break;
         }
       }
@@ -495,8 +626,8 @@
     function tryMove(dir) {
       const [dx, dy] = STEPS[dir], p = run.p, x = p.x + dx, y = p.y + dy;
       const m = monsterAt(x, y);
-      if (m) { hitMonster(m); return endTurn(); }
-      if (floor.merchant && floor.merchant.x === x && floor.merchant.y === y) { screen = 'shop'; cursor = 0; return; }
+      if (m) { attack(dir); return run && endTurn(); }
+      if (merchantAt(x, y)) { screen = 'shop'; cursor = 0; return; }
       if (tile(x, y) === '#') return;
       p.x = x; p.y = y;
       const here = floor.items.filter(i => i.x === x && i.y === y);
@@ -522,8 +653,8 @@
       }
       if (tile(p.x, p.y) === '>') {
         if (floor.sealed) return say('The stairs are sealed. Something guards this floor.');
+        say('You go down to floor ' + (run.depth + 1) + '.');
         enterFloor(run.depth + 1);
-        say('You go down to floor ' + run.depth + '.');
         const fresh = checkUnlocks();
         for (const u of fresh) say('Unlocked: ' + u.name + ' (' + u.text + ').');
         return;
@@ -532,7 +663,7 @@
     }
 
     function rest() {
-      const awake = () => floor.monsters.some(m => visible(m.x, m.y));
+      const awake = () => floor.monsters.some(spotted);
       if (awake()) return say('Not with enemies in sight.');
       let n = 0;
       while (run && run.p.hp < stat.max() && !awake() && n++ < 100) endTurn();
@@ -552,7 +683,7 @@
         p.inv.splice(i, 1);
         if (p[slot]) p.inv.push(p[slot]);
         p[slot] = it;
-        say('You equip the ' + itemName(it) + '.' + (it.mod ? ' It ' + MODS[it.mod] + '.' : ''));
+        say('You equip the ' + itemName(it) + '. ' + describe(it));
         return endTurn();
       }
       p.inv.splice(i, 1);
@@ -573,9 +704,9 @@
           say('The world lurches. You are somewhere else.');
         }
         if (it.id === 'blast') {
-          const hit = floor.monsters.filter(m => visible(m.x, m.y));
+          const hit = floor.monsters.filter(spotted);
           say(hit.length ? 'Fire bursts from the scroll!' : 'Fire bursts from the scroll, and hits nothing.');
-          for (const m of hit) { m.hp -= 8 + run.depth; m.awake = true; m.flash = 0.3; }
+          for (const m of hit) { m.hp -= 6 + Math.round(run.depth * 1.5); m.awake = true; m.flash = 0.3; }
           for (const m of hit.filter(m => m.hp <= 0)) kill(m);
         }
         if (it.id === 'enchant') { p.weapon.plus++; say('Your ' + itemName(p.weapon) + ' glows.'); }
@@ -763,9 +894,9 @@
     }
 
     function walk(dir) {
-      const seenBefore = floor.monsters.filter(m => visible(m.x, m.y)).length;
+      const seenBefore = floor.monsters.filter(spotted).length;
       tryMove(dir);
-      if (run && floor.monsters.filter(m => visible(m.x, m.y)).length > seenBefore) halted = true;
+      if (run && floor.monsters.filter(spotted).length > seenBefore) halted = true;
     }
 
     const ART = {
@@ -780,6 +911,8 @@
       armor: ['........', '.##..##.', '.######.', '..####..', '..####..', '..####..', '...##...', '........'],
       gold: ['........', '........', '...##...', '..#..#..', '..#.....', '..#..#..', '...##...', '........'],
       merchant: ['.######.', '..####..', '...##...', '..####..', '.######.', '..####..', '..#..#..', '..#..#..'],
+      fire: ['...#....', '...##...', '..###.#.', '.#####..', '.##.###.', '##..####', '##..####', '.######.'],
+      warn: ['##....##', '#......#', '........', '...##...', '...##...', '........', '#......#', '##....##'],
     };
 
     function bake(rows, color) {
@@ -796,7 +929,7 @@
     function theme() {
       ink = darkMode.matches ? '#FFFFFF' : '#231F20';
       paper = darkMode.matches ? '#231F20' : '#FFFFFF';
-      for (const k in ART) img[k] = bake(ART[k], k === 'player' ? RED : ink);
+      for (const k in ART) img[k] = bake(ART[k], ['player', 'fire', 'warn'].includes(k) ? RED : ink);
       img.dim = bake(ART.wall, darkMode.matches ? '#6E6A6B' : '#B9B7B8');
       for (const k in ENEMIES) { img['e_' + k] = bake(ENEMIES[k].art, ink); img['r_' + k] = bake(ENEMIES[k].art, RED); }
     }
@@ -892,8 +1025,12 @@
       }
       for (const it of floor.items) if (visible(it.x, it.y)) v.drawImage(img[it.gold ? 'gold' : it.item.kind], ox + it.x * T, oy + it.y * T);
       if (floor.merchant && floor.seen[floor.merchant.y][floor.merchant.x]) v.drawImage(img.merchant, ox + floor.merchant.x * T, oy + floor.merchant.y * T);
+      for (const [k, kind] of [...[...floor.fire.keys()].map(k => [k, 'fire']), ...[...floor.warn].map(k => [k, 'warn'])]) {
+        const [x, y] = k.split(',').map(Number);
+        if (visible(x, y)) v.drawImage(img[kind], ox + x * T, oy + y * T);
+      }
       for (const m of floor.monsters) {
-        if (!visible(m.x, m.y)) continue;
+        if (!spotted(m)) continue;
         v.drawImage(img[(m.flash || m.boss ? 'r_' : 'e_') + m.key], ox + m.x * T, oy + m.y * T);
       }
       if (!p.flash || Math.floor(p.flash * 20) % 2) v.drawImage(img.player, px, py);
@@ -915,8 +1052,10 @@
 
     function drawList(title, items, help, cols) {
       const w = Math.min(VW - 8, cols * 8 + 4), fit = Math.floor((w - 12) / 8), p = run.p;
-      const notes = (screen === 'bag' ? ['Wield: ' + itemName(p.weapon), 'Wear: ' + (p.armor ? itemName(p.armor) : 'nothing')] : [])
-        .flatMap(l => wrap(l, fit)).concat(wrap(help, fit));
+      const picked = (screen === 'bag' ? p.inv : floor.merchant.wares)[cursor];
+      const notes = [[picked ? describe(picked) : '', ink], ['', ink],
+      ...(screen === 'bag' ? [['Wield: ' + itemName(p.weapon), '#8E8A8B'], ['Wear: ' + (p.armor ? itemName(p.armor) : 'nothing'), '#8E8A8B']] : []),
+      [help, '#8E8A8B']].flatMap(([l, c]) => l ? wrap(l, fit).map(s => [s, c]) : picked ? [['', c]] : []);
       const rows = Math.max(items.length, 1), h = 24 + rows * 11 + 6 + notes.length * 10 + 4;
       const x = Math.round((VW - w) / 2), y = Math.max(16, Math.round((VH - padH - h) / 2));
       box(x, y, w, h);
@@ -927,7 +1066,7 @@
         words(it.slice(0, Math.floor((w - 20) / 8)), x + 14, y + 22 + i * 11);
         if (i === cursor) arrow(x + 5, y + 22 + i * 11);
       });
-      notes.forEach((l, i) => words(l, x + 6, y + 22 + rows * 11 + 6 + i * 10, '#8E8A8B'));
+      notes.forEach(([l, c], i) => words(l, x + 6, y + 22 + rows * 11 + 6 + i * 10, c));
     }
 
     function drawMap() {
