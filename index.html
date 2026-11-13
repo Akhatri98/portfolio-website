@@ -4,225 +4,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Adeel Khatri</title>
-  <meta name="description" content="Adeel Khatri - Mathematics &amp; Computer Science at NYU Courant, engineer at Biject. Skills, experience, projects, coursework, and reading.">
-  <link rel="icon" href="favicon.jpeg">
-  <link rel="stylesheet" href="style.css">
+  <title>Adeelpedia</title>
+  <meta name="description" content="Adeel Khatri, as a collage of encyclopedia infoboxes.">
+  <link rel="icon" href="/favicon.jpeg">
+  <link rel="stylesheet" href="wiki.css">
   <script defer src="/_vercel/insights/script.js"></script>
 </head>
 
 <body>
-
-  <header>
-    <h1>Adeel Khatri</h1>
-    <p>Mathematics &amp; Computer Science @ NYU Courant - New York, NY</p>
-    <p>
-      <a href="mailto:adeelkhatri98@gmail.com">adeelkhatri98@gmail.com</a> -
-      <a href="mailto:ak14245@nyu.edu">ak14245@nyu.edu</a> -
-      <a href="https://github.com/Akhatri98">GitHub</a> -
-      <a href="https://linkedin.com/in/adeelk98">LinkedIn</a> -
-      <a href="https://x.com/foogiest">X</a>
-    </p>
-    <nav>
-      <a href="#about">About</a> -
-      <a href="#skills">Skills</a> -
-      <a href="#education">Education</a> -
-      <a href="#experience">Experience</a> -
-      <a href="#projects">Projects</a> -
-      <a href="#coursework">Coursework</a> -
-      <a href="#reading">Reading</a>
+  <header class="topbar">
+    <nav class="filters" aria-label="Filters">
+      <a href="#" class="brand" data-filter="all">Adeel Khatri</a>
+      <button data-filter="me">Me</button>
+      <button data-filter="projects">Projects</button>
+      <button data-filter="education">Education</button>
+      <button data-filter="work">Work</button>
+      <button data-filter="inspiration">Inspiration</button>
     </nav>
-    <input type="checkbox" id="theme">
-    <label for="theme">Toggle dark/light</label>
+    <nav class="right">
+      <button id="shuffle" title="Rearrange the boxes">Random</button>
+      <button id="theme" title="Toggle light/dark">Dark</button>
+      <a href="/blog">Blog</a>
+    </nav>
   </header>
 
-  <section id="about">
-    <h2>About</h2>
-    <p>I resonate a lot with snoopy.</p>
-    <p>I'm deeply humbled, fascinated, and inspired by math. As should everyone else.</p>
-    <p>I also keep a <a href="/blog">blog</a>.</p>
-  </section>
+  <p class="hatnote">This article is stylized. For other uses, see <a href="/plain">Adeel Khatri
+      (disambiguation)</a>.</p>
 
-  <section id="skills">
-    <h2>Skills</h2>
-    <ul>
-      <li><b>Languages:</b> <mark>Python</mark>, <mark>Cpp</mark>, TypeScript, <mark>SQL</mark>, R, C, Java, Rust,
-        <mark>Lean</mark>
-      </li>
-      <li><b>Machine learning and data:</b> <mark>pandas</mark>, NumPy, <mark>scikit-learn</mark>, SciPy, spaCy</li>
-      <li><b>Frameworks:</b> <mark>React</mark>, Next.js, FastAPI, LangChain, <mark>Supabase</mark></li>
-      <li><b>Infrastructure and tools:</b> <mark>Git</mark>, Linux, <mark>Docker</mark>, HuggingFace, Pinecone, Z3</li>
-    </ul>
-  </section>
+  <main id="collage"></main>
 
-  <section id="education">
-    <h2>Education</h2>
+  <footer class="bottombar">
+    Inspirations:
+    <a href="https://kleinian.com/" target="_blank" rel="noopener">kleinian.com</a> -
+    <a href="https://www.wikipedia.org/" target="_blank" rel="noopener">Wikipedia</a>
+  </footer>
 
-    <h3><mark>B.A. Mathematics</mark> <small>September 2026 - May 2028</small></h3>
-    <p class="sub"><mark>New York University</mark></p>
-    <ul>
-      <li>Joint mathematics and computer science program.</li>
-    </ul>
-
-    <h3>Transfer <small>August 2024 - May 2026</small></h3>
-    <p class="sub">The Ohio State University</p>
-    <ul>
-      <li>Pursued a B.S. in Computer Science &amp; Engineering and a B.S. in Mathematics.</li>
-      <li>Directed reading program in number theory.</li>
-      <li>Point72 Academy.</li>
-    </ul>
-
-    <h3>Dual enrollment <small>August 2023 - May 2024</small></h3>
-    <p class="sub">The University of Toledo</p>
-    <ul>
-      <li>Math and physics coursework.</li>
-    </ul>
-  </section>
-
-  <section id="experience">
-    <h2>Experience</h2>
-
-    <h3><mark>Engineer</mark> <small>May 2026 - present</small></h3>
-    <p class="sub"><a href="https://www.bijectai.com/"><mark>Biject</mark></a></p>
-    <ul>
-      <li>Injections and surjections.</li>
-    </ul>
-
-    <h3>Software engineering intern <small>June 2025 - August 2025</small></h3>
-    <p class="sub">Hawala</p>
-    <ul>
-      <li>Full-stack development on web applications using React, TypeScript, and Supabase.</li>
-    </ul>
-
-    <h3>Research assistant <small>February 2025 - February 2026</small></h3>
-    <p class="sub">OSU, College of Veterinary Medicine</p>
-    <ul>
-      <li>Data extraction and analysis with OCR pipelines and R.</li>
-    </ul>
-
-    <h3>IT assistant <small>September 2024 - May 2026</small></h3>
-    <p class="sub">OSU, Fisher College of Business</p>
-    <ul>
-      <li>AV and network install and maintenance.</li>
-    </ul>
-
-    <h3>MCM coordinator <small>August 2025 - May 2026</small></h3>
-    <p class="sub">SIAM Student Chapter at Ohio State</p>
-    <ul>
-      <li>Event coordination.</li>
-    </ul>
-  </section>
-
-  <section id="projects">
-    <h2>Projects</h2>
-    <h3>
-      <a>SMT Foldings</a> <small>2026</small>
-    </h3>
-    <p class="sub">Z3, Lean, Python</p>
-    <p>Using SMT solvers on predicted protien outputs from generative models to analyze their physical/geometric
-      validity.</p>
-
-    <h3><a href="https://www.bijectai.com/news/one-line-guardrail">Proofread</a> <small>2026</small></h3>
-    <p class="sub">Lean, MongoDB, Python</p>
-    <p>Verfied recursive harnesses. Documented cases of catching an agent "cheating" for the sake of a higher benchmark.
-    </p>
-
-    <h3><a href="https://github.com/Akhatri98/nytw_mmhacks_finley">Finley</a>
-      <small>2026</small>
-    </h3>
-    <p class="sub">Python, RAG, LLMs, Pinecone</p>
-    <p>Mutimodal, live-trading RAG agent. Buzzword buzzword buzzword.</p>
-
-    <h3><a href="https://github.com/Akhatri98/TF-IDF-news-model">Equity news prediction model</a> <small>2026</small>
-    </h3>
-    <p class="sub">Python, scikit-learn, Flask, Docker</p>
-    <p>TF-IDF</p>
-
-    <h3>Cross-asset trading algo <small>2025</small></h3>
-    <p class="sub">Python, pandas, Streamlit</p>
-    <p>I used this for a while and I swear to you I lost the sourcecode but it was so good when I used it, like 3x the
-      SPY average good.</p>
-
-    <h3><a href="https://github.com/Akhatri98/portfolio-website">This website</a> <small>2026</small></h3>
-    <p class="sub">HTML, CSS</p>
-    <p>I wish I used PHP for this site.</p>
-
-    <h3><a href="https://github.com/Akhatri98/NHANES-model">NHANES data analysis</a> <small>2026</small></h3>
-    <p class="sub">Python, pandas, scikit-learn</p>
-    <p>I was doing orthepedic research but idk what happened I think I got lazy. I think I ended up using ridge
-      regression though to predict bone fractures.</p>
-
-    <h3><a href="https://internships.akhatri.dev/">Job aggregator</a> <small>2026</small></h3>
-    <p class="sub">Python, Open Crawl, Supabase</p>
-    <p>Tell me ONE job aggregator that's better. There ISN'T.</p>
-
-    <h3>LangChain Discord agent <small>2025</small></h3>
-    <p class="sub">Python, LangChain, APIs</p>
-    <p>I don't own this repo.</p>
-
-    <h3><a href="https://akhatri98.itch.io/cude">Cude.</a><small>2024</small></h3>
-    <p class="sub">C#, Unity, Blender</p>
-    <p>This is where my coding ability peaked.</p>
-  </section>
-
-  <section id="coursework">
-    <h2>Coursework</h2>
-
-    <h3>Mathematics</h3>
-    <ul>
-      <li><b>Calculus 3</b> - multivariable calculus, partial derivatives, multiple integrals</li>
-      <li><b>Linear Algebra</b> - vector spaces, eigentheory</li>
-      <li><b>Differential Equations</b> - ordinary differential equations, Laplace transforms</li>
-      <li><b><mark>Partial Differential Equations</mark></b> - heat/wave equations, separation of variables, Fourier
-        series</li>
-      <li><b><mark>Abstract Algebra</mark></b> - groups, rings, fields</li>
-      <li><b><mark>Real Analysis</mark></b> - sequences, continuity, metric spaces</li>
-      <li><b>Discrete Math</b> - combinatorics, logic, graph theory, proof techniques</li>
-      <li><b><mark>Probability</mark></b> - combinatorics, random variables, distributions</li>
-      <li><b><mark>Statistics</mark></b> - estimation, hypothesis testing, regression</li>
-    </ul>
-
-    <h3>Computer science</h3>
-    <ul>
-      <li><b>Intro to OOP</b> - classes, inheritance, polymorphism</li>
-      <li><b>Advanced Web Design</b> - frontend frameworks, responsive layout</li>
-      <li><b>Data Structures</b> - trees, graphs, hashing, memory management</li>
-      <li><b><mark>Computer Architecture</mark></b> - pipelines, memory hierarchy, ISA, digital logic</li>
-      <li><b><mark>Operating Systems</mark></b> - process scheduling, concurrency, memory management, virtual memory
-      </li>
-      <li><b>Database Systems</b> - relational model, SQL, indexing, schema design</li>
-      <li><b>Algorithms</b> - complexity, dynamic programming, greedy algorithms</li>
-      <li><b>Python Programming</b> - syntax, scripts, data structures</li>
-      <li><b><mark>Algorithmic Problem Solving</mark></b> - competitive programming, graph algorithms, dynamic
-        programming, range queries</li>
-      <li><b>Computer Security</b> - cryptographic protocols, network, OS, and web security</li>
-      <li><b>Applied Internet Technology</b> - full-stack JavaScript, Node/Express, MongoDB, React</li>
-    </ul>
-  </section>
-
-  <section id="reading">
-    <h2>Reading</h2>
-    <h3>Top Reads</h3>
-    <ul>
-      <li><i><mark>Statistical Prediction and Machine Learning</mark></i> - J.T. Chen</li>
-      <li><i>Being and Nothingness</i> - Jean-Paul Sartre</li>
-      <li><i>The Hunchback of Notre-Dame</i> - Victor Hugo</li>
-      <li><i><mark>The Alchemy of Happiness</mark></i> - Al-Ghazali</li>
-      <li><i><mark>And a Woodstock in a Birch Tree</mark></i> - Charles M. Schulz</li>
-      <li><i>Maxims and Reflections</i> - J.W. von Goethe</li>
-      <li><i><mark>Fahrenheit 451</mark></i> - Ray Bradbury</li>
-    </ul>
-
-    <h3>Want to Read</h3>
-    <ul>
-      <li><i>A Concise Course in Algebraic Topology</i> - J.P. May</li>
-      <li><i><mark>Proofs from THE BOOK</mark></i> - M. Aigner &amp; G.M. Ziegler</li>
-      <li><i>The Anduril Thesis</i> - K. Harrison &amp; S. Maini</li>
-      <li><i>The Beginning of Guidance</i> - Al-Ghazali</li>
-      <li><i><mark>Magnifica Humanitas</mark></i> - Pope Leo XIV</li>
-    </ul>
-  </section>
-
+  <script src="entries.js"></script>
+  <script src="wiki.js"></script>
 </body>
 
 </html>

@@ -3,5 +3,8 @@
   "framework": null,
   "installCommand": "",
   "buildCommand": "",
-  "cleanUrls": true
+  "cleanUrls": true,
+  "redirects": [
+    { "source": "/wiki", "destination": "/", "permanent": true }
+  ]
 }

@@ -3,3 +3,6 @@
 .env.*
 
 /drafts
+/tools
+
+entries.js.bak
