@@ -231,6 +231,18 @@ const ENTRIES = [
     },
   },
   {
+    title: "Linnet",
+    image: "",
+    caption: "Built solo at HackPrinceton Fall 2026 (Healthcare track)",
+    tags: ["projects"],
+    facts: {
+      "Released": "2026",
+      "Written in": "Python, C++, Z3, FastAPI",
+      "Description": "Schedules a patient's medications around every timing rule on their FDA labels, or proves no schedule exists and names the exact label sentences that conflict",
+      "Source": "<a href=\"https://github.com/Akhatri98/hpton26-linnet\" target=\"_blank\" rel=\"noopener\">GitHub</a>",
+    },
+  },
+  {
     title: "Proofread",
     italic: true,
     image: "",

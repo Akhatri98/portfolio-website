@@ -46,7 +46,8 @@ function build(e) {
   if (e.video) {
     // YouTube embed: video: { id, start }  (start in seconds, optional)
     const start = e.video.start ? `?start=${e.video.start}` : "";
-    html += `<figure><div class="video"><iframe src="https://www.youtube.com/embed/${e.video.id}${start}"
+    // phones show a still thumbnail in the tile; the player itself only appears in the opened card
+    html += `<figure><img class="vthumb" src="https://i.ytimg.com/vi/${e.video.id}/hqdefault.jpg" alt="${e.title}"><div class="video"><iframe src="https://www.youtube.com/embed/${e.video.id}${start}"
       title="${e.title}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>${cap}</figure>`;
   } else if (e.image === "default") {
     html += `<figure>${NO_IMAGE}${cap}</figure>`;
@@ -103,7 +104,7 @@ const LOOKAHEAD = 4; // how many upcoming boxes may jump the queue to fill a gap
 const SPAN_TOL = 60;  // px: a box may reach over neighbours up to this much higher (a small gap under it)
 
 function widthsFor(C) {
-  if (C < 560) return [60];       // phone: one column
+  if (C < 560) return [30];       // phone: two columns of compact tiles (tap one to open it)
   if (C < 900) return [20, 30];   // tablet: thirds / halves
   if (C < 1200) return [15, 20, 30]; // small desktop: 1/4, 1/3, 1/2
   return [12, 15, 20];            // desktop: 1/5, 1/4, 1/3
@@ -126,6 +127,7 @@ function layout() {
   const random = rng(layoutSeed);
   const queue = visibleBoxes();
   const C = collage.clientWidth;
+  collage.classList.toggle("compact", C < 560); // before measuring: compact tiles are only picture + title
   const unit = (C + GAP) / 60;  // each box owns its width + one gap
   const widths = widthsFor(C);
   const minW = widths[0];
@@ -337,20 +339,125 @@ document.getElementById("shuffle").addEventListener("click", async () => {
 });
 
 // in-box links like <a data-goto="New York University"> jump to that box
-collage.addEventListener("click", (ev) => {
-  const a = ev.target.closest("a[data-goto], sup.cn a");
-  if (!a) return;
-  ev.preventDefault();
-  if (!a.dataset.goto) return;
+function goTo(title) {
   filter = "all";
   applyFilter();
-  const target = [...collage.children].find((b) => b.dataset.title === a.dataset.goto);
+  const target = [...collage.children].find((b) => b.dataset.title === title);
   if (target) {
     target.scrollIntoView({ behavior: "smooth", block: "center" });
     target.classList.add("flash");
     setTimeout(() => target.classList.remove("flash"), 1200);
   }
+}
+
+collage.addEventListener("click", (ev) => {
+  const a = ev.target.closest("a[data-goto], sup.cn a");
+  if (a) {
+    ev.preventDefault();
+    if (a.dataset.goto) goTo(a.dataset.goto);
+    return;
+  }
+  // phones: tapping a compact tile lifts it out into the full card
+  const box = ev.target.closest(".infobox");
+  if (box && collage.classList.contains("compact") && !ev.target.closest("a")) openCard(box);
 });
+
+// ---------- phone "lightbox": the tile rises off the page and grows into the full card ----------
+let open = null; // { box, overlay, card }
+
+function openCard(box) {
+  if (open) return;
+  const from = box.getBoundingClientRect();
+  const overlay = document.createElement("div");
+  overlay.className = "lightbox";
+  const card = box.cloneNode(true);
+  card.removeAttribute("style");
+  card.className = "infobox expanded";
+  overlay.append(card);
+  document.body.append(overlay);
+  document.body.style.overflow = "hidden";
+  box.classList.add("lifted");
+  open = { box, overlay, card };
+  fitCard(card);
+
+  if (reduceMotion.matches) return;
+  overlay.animate(
+    [{ backgroundColor: "rgba(0,0,0,0)", backdropFilter: "blur(0px)" }, {}],
+    { duration: 380, easing: "ease-out" }
+  );
+  card.animate(morph(from, card), {
+    duration: 520, easing: "cubic-bezier(.2, .9, .25, 1.08)", // a touch of overshoot, so it "lands"
+  });
+}
+
+// shrink a tall card so it fits the screen without scrolling. It is zoomed out while its layout width grows by
+// the same factor, so it stays as wide on screen and the text reflows into fewer lines. Only below
+// MIN_ZOOM (very short screens) does it give up and scroll.
+const MIN_ZOOM = 0.72;
+function fitCard(card) {
+  const vh = window.visualViewport ? visualViewport.height : innerHeight;
+  const availH = vh - 48;
+  const availW = Math.min(innerWidth - 32, 440);
+  let z = 1;
+  for (let i = 0; i < 5; i++) {
+    card.style.zoom = z;
+    card.style.width = `${availW / z}px`;
+    card.style.maxHeight = "none";
+    const h = card.getBoundingClientRect().height; // on-screen height, zoom included
+    if (h <= availH + 1 || z === MIN_ZOOM) break;
+    z = Math.max(MIN_ZOOM, z * Math.sqrt(availH / h) * 0.98); // sqrt: reflow also helps, so don't overshoot
+  }
+  card.style.maxHeight = `${availH / z}px`;
+}
+
+// keyframes that start the card exactly over the tile (same width, cropped to the tile's height),
+// then lift it up toward the reader and unfold the rest of the details
+function morph(from, card) {
+  const to = card.getBoundingClientRect();
+  const z = parseFloat(card.style.zoom) || 1; // transform/clip lengths are in the card's own (zoomed) px
+  const s = from.width / to.width;
+  const clip = Math.max(0, to.height - from.height / s) / z;
+  return [
+    {
+      transform: `translate(${(from.left - to.left) / z}px, ${(from.top - to.top) / z}px) scale(${s})`,
+      clipPath: `inset(0 0 ${clip}px 0)`,
+      boxShadow: "0 1px 2px rgba(0,0,0,.1)",
+    },
+    {
+      transform: `translate(${((from.left - to.left) * 0.4) / z}px, ${((from.top - to.top) * 0.4 - 24) / z}px) scale(${s + (1 - s) * 0.7})`,
+      clipPath: `inset(0 0 ${clip * 0.25}px 0)`,
+      offset: 0.45,
+    },
+    { transform: "none", clipPath: "inset(0 0 0 0)", boxShadow: "0 28px 70px rgba(0,0,0,.4)" },
+  ];
+}
+
+async function closeCard() {
+  if (!open) return;
+  const { box, overlay, card } = open;
+  open = null;
+  if (!reduceMotion.matches) {
+    card.scrollTop = 0;
+    const back = morph(box.getBoundingClientRect(), card).reverse();
+    back[1].offset = 0.55;
+    overlay.animate([{}, { backgroundColor: "rgba(0,0,0,0)", backdropFilter: "blur(0px)" }],
+      { duration: 340, easing: "ease-in", fill: "forwards" });
+    await card.animate(back, { duration: 380, easing: "cubic-bezier(.4, 0, .2, 1)", fill: "forwards" }).finished;
+  }
+  box.classList.remove("lifted");
+  overlay.remove();
+  document.body.style.overflow = "";
+}
+
+document.addEventListener("click", (ev) => {
+  if (!open || !open.overlay.contains(ev.target)) return; // (ignores the very tap that opened it)
+  if (!open.card.contains(ev.target)) return closeCard(); // tap outside puts it back
+  const a = ev.target.closest("a[data-goto], sup.cn a");
+  if (!a) return;
+  ev.preventDefault();
+  if (a.dataset.goto) closeCard().then(() => goTo(a.dataset.goto));
+});
+document.addEventListener("keydown", (ev) => { if (ev.key === "Escape") closeCard(); });
 
 // light/dark toggle (remembered per browser; falls back to the OS setting)
 const themeBtn = document.getElementById("theme");

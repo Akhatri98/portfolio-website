@@ -267,3 +267,45 @@ sup.ref { font-size: 75%; white-space: nowrap; }
 
 /* wide logos on a coloured background (e.g. NYU banners): give them breathing room */
 .infobox figure img[style*="background"]:not(.logo) { padding: 10px 12px; box-sizing: border-box; }
+
+/* ---------- phones: compact tiles (picture + title), tap one to open the full card ---------- */
+.infobox .vthumb { display: none; }
+
+#collage.compact .infobox { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+#collage.compact .infobox figcaption,
+#collage.compact .infobox table,
+#collage.compact .infobox .map,
+#collage.compact .infobox .video { display: none; }
+#collage.compact .infobox .vthumb { display: block; aspect-ratio: 16 / 9; object-fit: cover; }
+#collage.compact .infobox .title { font-size: 100%; padding: 3px 4px 4px; }
+#collage.compact .infobox figure { margin: 0; }
+#collage.compact .infobox img:not(.logo):not(.cover) { max-height: 150px; object-fit: cover; }
+#collage.compact .infobox img.logo { width: 60%; margin: 4px auto; }
+#collage.compact .infobox img.cover { width: 60%; margin: 4px auto; }
+#collage.compact .infobox .default-img { max-height: 90px; }
+#collage.compact .infobox .noimg { height: 90px !important; }
+#collage.compact.ready .infobox:active { transform: scale(.96); transition-duration: .1s; }
+#collage .infobox.lifted { visibility: hidden; }
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background: rgba(0, 0, 0, .45);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.lightbox .infobox.expanded {
+  position: relative;
+  width: min(100%, 440px);
+  max-height: calc(100dvh - 48px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  transform-origin: top left;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, .4);
+  will-change: transform, clip-path;
+}
